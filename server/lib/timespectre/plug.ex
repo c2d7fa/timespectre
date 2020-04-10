@@ -1,14 +1,11 @@
 defmodule Timespectre.Plug do
-  import Plug.Conn
+  use Plug.Builder
 
-  def init(options) do
-    options
-  end
+  plug Plug.Static, at: "/", from: "../dist/"
+  plug :not_found
 
-  def call(conn, _options) do
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(200, "Hello, World!\n")
+  def not_found(conn, _opts) do
+    conn |> send_resp(404, "Not found")
   end
 end
 

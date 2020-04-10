@@ -10,7 +10,7 @@ defmodule Timespectre.Application do
       Plug.Cowboy.child_spec(scheme: :http, plug: Timespectre.Plug, port: 8080)
     ]
 
-    IO.puts("Listening on http://localhost:8080/")
+    IO.puts("Listening on http://localhost:8080/index.html")
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
