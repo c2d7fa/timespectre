@@ -6,7 +6,7 @@ defmodule Timespectre.Plug do
   plug :dispatch
 
   get "/api/counter" do
-    conn |> send_resp(200, "0")
+    conn |> send_resp(200, "2")
   end
 
   post "/api/counter/increment" do
