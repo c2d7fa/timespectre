@@ -29,6 +29,7 @@ type Msg
     = Increment
     | Decrement
     | Received (Result Http.Error String)
+    | Posted (Result Http.Error ())
 
 
 subscriptions : Model -> Sub Msg
@@ -55,10 +56,13 @@ update msg model =
             ( Loading, Cmd.none )
 
         ( Increment, Value n ) ->
-            ( Value (n + 1), Cmd.none )
+            ( Value (n + 1), Http.post { url = "/api/counter/increment", body = Http.emptyBody, expect = Http.expectWhatever Posted } )
 
         ( Decrement, Value n ) ->
-            ( Value (n - 1), Cmd.none )
+            ( Value (n - 1), Http.post { url = "/api/counter/decrement", body = Http.emptyBody, expect = Http.expectWhatever Posted } )
+
+        ( Posted _, _ ) ->
+            ( model, Cmd.none )
 
 
 view model =
@@ -67,4 +71,8 @@ view model =
             text "Loading..."
 
         Value n ->
-            text (String.fromInt n)
+            div []
+                [ text (String.fromInt n)
+                , button [ onClick Increment ] [ text "Increment" ]
+                , button [ onClick Decrement ] [ text "Decrement" ]
+                ]

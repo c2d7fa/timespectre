@@ -10,10 +10,12 @@ defmodule Timespectre.Plug do
   end
 
   post "/api/counter/increment" do
+    IO.puts("Increment")
     conn |> send_resp(501, "TODO")
   end
 
   post "/api/counter/decrement" do
+    IO.puts("Decrement")
     conn |> send_resp(501, "TODO")
   end
 
