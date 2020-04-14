@@ -11,22 +11,35 @@ defmodule Timespectre.Plug do
   plug :dispatch, builder_opts()
 
   def init(_opts) do
-    {:ok, pid} = Agent.start_link(fn () -> 0 end)
-    pid
+    Sqlitex.with_db("test.db", fn db ->
+      Sqlitex.query db, "CREATE TABLE counters (user TEXT PRIMARY KEY, counter INTEGER)"
+      Sqlitex.query db, "INSERT INTO counters (user, counter) VALUES ('global', 0)"
+    end)
+    nil
   end
 
   get "/api/counter" do
-    counter = Agent.get(opts, fn x -> x end)
+    [[counter: counter]] = Sqlitex.with_db("test.db", &Sqlitex.query!(&1, "SELECT counter FROM counters WHERE user = 'global'") )
     send_resp(conn, 200, to_string(counter))
   end
 
   post "/api/counter/increment" do
-    Agent.update(opts, fn x -> x + 1 end)
+    Sqlitex.with_db("test.db", fn db ->
+      Sqlitex.query! db, "BEGIN"
+      [[counter: counter]] = Sqlitex.query! db, "SELECT counter FROM counters WHERE user = 'global'"
+      Sqlitex.query! db, "UPDATE counters SET counter = ?1 WHERE user = 'global'", bind: [counter + 1]
+      Sqlitex.query! db, "COMMIT"
+    end)
     send_resp(conn, 200, "")
   end
 
   post "/api/counter/decrement" do
-    Agent.update(opts, fn x -> x - 1 end)
+    Sqlitex.with_db("test.db", fn db ->
+      Sqlitex.query! db, "BEGIN"
+      [[counter: counter]] = Sqlitex.query! db, "SELECT counter FROM counters WHERE user = 'global'"
+      Sqlitex.query! db, "UPDATE counters SET counter = ?1 WHERE user = 'global'", bind: [counter - 1]
+      Sqlitex.query! db, "COMMIT"
+    end)
     send_resp(conn, 200, "")
   end
 
