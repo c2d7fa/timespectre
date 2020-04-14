@@ -12,6 +12,8 @@ defmodule Timespectre.Plug do
 
   def init(_opts) do
     Sqlitex.with_db("test.db", fn db ->
+      # May fail. If they do, it means that we probably already initialized the
+      # database.
       Sqlitex.query db, "CREATE TABLE counters (user TEXT PRIMARY KEY, counter INTEGER)"
       Sqlitex.query db, "INSERT INTO counters (user, counter) VALUES ('global', 0)"
     end)
@@ -25,20 +27,14 @@ defmodule Timespectre.Plug do
 
   post "/api/counter/increment" do
     Sqlitex.with_db("test.db", fn db ->
-      Sqlitex.query! db, "BEGIN"
-      [[counter: counter]] = Sqlitex.query! db, "SELECT counter FROM counters WHERE user = 'global'"
-      Sqlitex.query! db, "UPDATE counters SET counter = ?1 WHERE user = 'global'", bind: [counter + 1]
-      Sqlitex.query! db, "COMMIT"
+      Sqlitex.query! db, "UPDATE counters SET counter = counter + 1 WHERE user = 'global'"
     end)
     send_resp(conn, 200, "")
   end
 
   post "/api/counter/decrement" do
     Sqlitex.with_db("test.db", fn db ->
-      Sqlitex.query! db, "BEGIN"
-      [[counter: counter]] = Sqlitex.query! db, "SELECT counter FROM counters WHERE user = 'global'"
-      Sqlitex.query! db, "UPDATE counters SET counter = ?1 WHERE user = 'global'", bind: [counter - 1]
-      Sqlitex.query! db, "COMMIT"
+      Sqlitex.query! db, "UPDATE counters SET counter = counter - 1 WHERE user = 'global'"
     end)
     send_resp(conn, 200, "")
   end
