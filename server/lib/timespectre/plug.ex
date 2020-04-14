@@ -21,26 +21,27 @@ defmodule Timespectre.Plug do
   end
 
   get "/api/counter" do
-    [[counter: counter]] = Sqlitex.with_db("test.db", &Sqlitex.query!(&1, "SELECT counter FROM counters WHERE user = 'global'") )
+    [[counter: counter]] = query! "SELECT counter FROM counters WHERE user = 'global'"
     send_resp(conn, 200, to_string(counter))
   end
 
   post "/api/counter/increment" do
-    Sqlitex.with_db("test.db", fn db ->
-      Sqlitex.query! db, "UPDATE counters SET counter = counter + 1 WHERE user = 'global'"
-    end)
+    query! "UPDATE counters SET counter = counter + 1 WHERE user = 'global'"
     send_resp(conn, 200, "")
   end
 
   post "/api/counter/decrement" do
-    Sqlitex.with_db("test.db", fn db ->
-      Sqlitex.query! db, "UPDATE counters SET counter = counter - 1 WHERE user = 'global'"
-    end)
+    query! "UPDATE counters SET counter = counter - 1 WHERE user = 'global'"
     send_resp(conn, 200, "")
   end
 
   match _ do
     send_resp(conn, 404, "Not found")
+  end
+
+  defp query!(sql, opts \\ []) do
+    {:ok, result} = Sqlitex.Server.query(Timespectre.DB, sql, opts)
+    result
   end
 end
 

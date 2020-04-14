@@ -6,7 +6,10 @@ defmodule Timespectre.Application do
   use Application
 
   def start(_type, _args) do
+    import Supervisor.Spec
+
     children = [
+      worker(Sqlitex.Server, ["test.db", [name: Timespectre.DB]]),
       Plug.Cowboy.child_spec(scheme: :http, plug: Timespectre.Plug, port: 8080)
     ]
 
