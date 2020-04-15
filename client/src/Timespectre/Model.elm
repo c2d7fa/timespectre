@@ -1,6 +1,8 @@
 module Timespectre.Model exposing (..)
 
 import Debug
+import Http
+import Json.Encode
 import Random
 import Task
 import Time
@@ -20,6 +22,7 @@ type Msg
     | RecordActiveSession Time.Posix String
     | SetTimeZone Time.Zone
     | SetTime Time.Posix
+    | DiscardResponse (Result Http.Error ())
 
 
 init : () -> ( Model, Cmd Msg )
@@ -55,7 +58,26 @@ update msg model =
             ( { model | currentTime = time }, Cmd.none )
 
         RecordActiveSession start id ->
-            ( recordActiveSession start id model, Cmd.none )
+            ( recordActiveSession start id model
+            , Http.request
+                { method = "PUT"
+                , headers = []
+                , url = "/api/sessions/" ++ id
+                , body =
+                    Http.jsonBody
+                        (Json.Encode.object
+                            [ ( "start", Json.Encode.int (Time.posixToMillis start) )
+                            , ( "end", Json.Encode.int (Time.posixToMillis model.currentTime) )
+                            ]
+                        )
+                , expect = Http.expectWhatever DiscardResponse
+                , timeout = Nothing
+                , tracker = Nothing
+                }
+            )
+
+        DiscardResponse _ ->
+            ( model, Cmd.none )
 
 
 startSession : Model -> Model
