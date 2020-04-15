@@ -10,59 +10,63 @@ import Timespectre.Model exposing (..)
 
 view : Model -> Html.Html Msg
 view model =
-    Html.div [] [ viewActive model.active, viewControls model.active, viewSessions model.sessions ]
+    Html.div [] [ viewActive model, viewControls model, viewSessions model ]
 
 
-viewActive : ActiveSession -> Html.Html Msg
-viewActive active =
-    case active of
+viewActive : Model -> Html.Html Msg
+viewActive model =
+    case model.active of
         Nothing ->
             Html.text "No active session."
 
         Just start ->
-            Html.text ("Active session since " ++ formatTime start)
+            Html.text ("Active session since " ++ formatTime model.timeZone start)
 
 
-viewControls : ActiveSession -> Html.Html Msg
-viewControls active =
-    case active of
-        Nothing ->
-            Html.button [] [ Html.text "Start" ]
+viewControls : Model -> Html.Html Msg
+viewControls model =
+    let
+        label =
+            case model.active of
+                Nothing ->
+                    "Start"
 
-        Just _ ->
-            Html.button [] [ Html.text "End" ]
+                Just _ ->
+                    "End"
+    in
+    Html.button [ Ev.onClick ToggleActiveSession ] [ Html.text label ]
 
 
-viewSessions : List Session -> Html.Html Msg
-viewSessions sessions =
+viewSessions : Model -> Html.Html Msg
+viewSessions model =
     Html.div []
         [ Html.h1 [] [ Html.text "Sessions" ]
-        , Html.div [] (List.map viewSession sessions)
+        , Html.div [] (List.map (viewSession model.timeZone) model.sessions)
         ]
 
 
-viewSession : Session -> Html.Html Msg
-viewSession session =
+viewSession : Time.Zone -> Session -> Html.Html Msg
+viewSession zone session =
     Html.div [ Attr.class "session" ]
-        [ session.start |> formatTime |> Html.text
+        [ session.start |> formatTime zone |> Html.text
         , Html.text " to "
-        , session.end |> formatTime |> Html.text
+        , session.end |> formatTime zone |> Html.text
         ]
 
 
-formatTime : Time.Posix -> String
-formatTime time =
-    (time |> Time.toYear Time.utc |> String.fromInt)
+formatTime : Time.Zone -> Time.Posix -> String
+formatTime zone time =
+    (time |> Time.toYear zone |> String.fromInt)
         ++ "-"
-        ++ (time |> Time.toMonth Time.utc |> formatMonth)
+        ++ (time |> Time.toMonth zone |> formatMonth)
         ++ "-"
-        ++ (time |> Time.toDay Time.utc |> String.fromInt)
+        ++ (time |> Time.toDay zone |> String.fromInt)
         ++ " "
-        ++ (time |> Time.toHour Time.utc |> String.fromInt |> String.padLeft 2 '0')
+        ++ (time |> Time.toHour zone |> String.fromInt |> String.padLeft 2 '0')
         ++ ":"
-        ++ (time |> Time.toMinute Time.utc |> String.fromInt |> String.padLeft 2 '0')
+        ++ (time |> Time.toMinute zone |> String.fromInt |> String.padLeft 2 '0')
         ++ ":"
-        ++ (time |> Time.toSecond Time.utc |> String.fromInt |> String.padLeft 2 '0')
+        ++ (time |> Time.toSecond zone |> String.fromInt |> String.padLeft 2 '0')
 
 
 formatMonth : Time.Month -> String
