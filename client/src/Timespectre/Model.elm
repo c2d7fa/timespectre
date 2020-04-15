@@ -1,6 +1,7 @@
 module Timespectre.Model exposing (..)
 
 import Debug
+import Random
 import Task
 import Time
 import Timespectre.Data exposing (..)
@@ -16,6 +17,7 @@ type alias Model =
 
 type Msg
     = ToggleActiveSession
+    | RecordActiveSession Time.Posix String
     | SetTimeZone Time.Zone
     | SetTime Time.Posix
 
@@ -44,7 +46,7 @@ update msg model =
                     ( startSession model, Cmd.none )
 
                 Just start ->
-                    ( endSession start model, Cmd.none )
+                    ( model, endSession start )
 
         SetTimeZone timeZone ->
             ( { model | timeZone = timeZone }, Cmd.none )
@@ -52,12 +54,20 @@ update msg model =
         SetTime time ->
             ( { model | currentTime = time }, Cmd.none )
 
+        RecordActiveSession start id ->
+            ( recordActiveSession start id model, Cmd.none )
+
 
 startSession : Model -> Model
 startSession model =
     { model | active = Just model.currentTime }
 
 
-endSession : Time.Posix -> Model -> Model
-endSession start model =
-    { model | active = Nothing, sessions = { start = start, end = model.currentTime } :: model.sessions }
+endSession : Time.Posix -> Cmd Msg
+endSession start =
+    Random.generate (RecordActiveSession start) idGenerator
+
+
+recordActiveSession : Time.Posix -> String -> Model -> Model
+recordActiveSession start id model =
+    { model | active = Nothing, sessions = { id = id, start = start, end = model.currentTime } :: model.sessions }

@@ -51,6 +51,11 @@ viewSession zone session =
         [ session.start |> formatTime zone |> Html.text
         , Html.text " to "
         , session.end |> formatTime zone |> Html.text
+        , Html.code []
+            [ Html.text " (ID="
+            , Html.text session.id
+            , Html.text ")"
+            ]
         ]
 
 
