@@ -1,13 +1,11 @@
 defmodule Timespectre.Plug do
   use Plug.Router
 
+  plug Plug.Logger
   plug :match
   plug Plug.Static, at: "/", from: "../dist/"
-
-  # We want to store the counter as state. We can use Agents to store state. We
-  # need to make the agent's PID available to each route. We can do this by
-  # passing it in as an option. Apparently, passing in builder_opts() here let's
-  # us set the options in the init function.
+  # Apparently, passing in builder_opts() here lets us set the options in the
+  # init function.
   plug :dispatch, builder_opts()
 
   def init(_opts) do
