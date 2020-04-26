@@ -25,19 +25,12 @@ defmodule Timespectre.Plug do
     send_resp(conn, 200, "")
   end
 
-  get "/api/counter" do
-    [[counter: counter]] = query! "SELECT counter FROM counters WHERE user = 'global'"
-    send_resp(conn, 200, to_string(counter))
-  end
-
-  post "/api/counter/increment" do
-    query! "UPDATE counters SET counter = counter + 1 WHERE user = 'global'"
-    send_resp(conn, 200, "")
-  end
-
-  post "/api/counter/decrement" do
-    query! "UPDATE counters SET counter = counter - 1 WHERE user = 'global'"
-    send_resp(conn, 200, "")
+  get "/api/sessions" do
+    response = query!("SELECT * FROM sessions")
+      |> Enum.map(fn session -> {session[:id], %{:start => session[:start], :end => session[:end]}} end)
+      |> Map.new
+      |> Jason.encode!
+    send_resp(conn, 200, response)
   end
 
   match _ do
