@@ -2,6 +2,7 @@ module Timespectre.Model exposing (..)
 
 import Debug
 import Http
+import Json.Decode
 import Json.Encode
 import Random
 import Task
@@ -23,6 +24,7 @@ type Msg
     | SetTimeZone Time.Zone
     | SetTime Time.Posix
     | DiscardResponse (Result Http.Error ())
+    | FetchedSessions (Result Http.Error (List Session))
 
 
 init : () -> ( Model, Cmd Msg )
@@ -32,8 +34,36 @@ init () =
       , currentTime = Time.millisToPosix 0
       , active = Nothing
       }
-    , Task.perform SetTimeZone Time.here
+    , Cmd.batch [ Task.perform SetTimeZone Time.here, requestSessions ]
     )
+
+
+
+--sessionsDecoder : Json.Decode.Decoder (List Session)
+
+
+sessionsDecoder : Json.Decode.Decoder (List Session)
+sessionsDecoder =
+    Json.Decode.keyValuePairs
+        (Json.Decode.map2
+            (\start end -> { start = start, end = end })
+            (Json.Decode.field "start" Json.Decode.int)
+            (Json.Decode.field "end" Json.Decode.int)
+        )
+        |> Json.Decode.map
+            (List.map
+                (\( id, attrs ) ->
+                    { id = id
+                    , start = Time.millisToPosix attrs.start
+                    , end = Time.millisToPosix attrs.end
+                    }
+                )
+            )
+
+
+requestSessions : Cmd Msg
+requestSessions =
+    Http.get { url = "/api/sessions", expect = Http.expectJson FetchedSessions sessionsDecoder }
 
 
 subscriptions : Model -> Sub Msg
@@ -78,6 +108,12 @@ update msg model =
 
         DiscardResponse _ ->
             ( model, Cmd.none )
+
+        FetchedSessions (Err _) ->
+            Debug.log "Got error while fetching sessions" ( model, Cmd.none )
+
+        FetchedSessions (Ok sessions) ->
+            ( { model | sessions = sessions }, Cmd.none )
 
 
 startSession : Model -> Model
