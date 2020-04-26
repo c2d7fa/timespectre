@@ -26,8 +26,8 @@ defmodule Timespectre.Plug do
   end
 
   get "/api/sessions" do
-    response = query!("SELECT * FROM sessions ORDER BY end DESC", into: %{}) |> Jason.encode!
-    send_resp(conn, 200, response)
+    sessions = query! "SELECT * FROM sessions ORDER BY end DESC", into: %{}
+    send_resp(conn, 200, Jason.encode! sessions)
   end
 
   match _ do
