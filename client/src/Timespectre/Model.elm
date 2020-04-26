@@ -20,3 +20,4 @@ type Msg
     | SetTime Time.Posix
     | DiscardResponse (Result Http.Error ())
     | FetchedSessions (Result Http.Error (List Session))
+    | DeleteSession Session

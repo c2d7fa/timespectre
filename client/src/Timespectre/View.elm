@@ -56,6 +56,7 @@ viewSession zone session =
             , Html.text session.id
             , Html.text ")"
             ]
+        , Html.button [ Ev.onClick (DeleteSession session) ] [ Html.text "Delete" ]
         ]
 
 

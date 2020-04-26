@@ -65,6 +65,9 @@ update msg model =
         FetchedSessions (Ok sessions) ->
             ( { model | sessions = sessions }, Cmd.none )
 
+        DeleteSession session ->
+            ( { model | sessions = List.filter (\s -> s.id /= session.id) model.sessions }, API.deleteSession session )
+
 
 startSession : Model -> Model
 startSession model =

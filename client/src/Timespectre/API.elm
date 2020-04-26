@@ -1,4 +1,8 @@
-module Timespectre.API exposing (putSession, requestSessions)
+module Timespectre.API exposing
+    ( deleteSession
+    , putSession
+    , requestSessions
+    )
 
 import Http
 import Json.Decode
@@ -40,4 +44,17 @@ putSession session =
         , expect = Http.expectWhatever DiscardResponse
         , timeout = Nothing
         , tracker = Nothing
+        }
+
+
+deleteSession : Session -> Cmd Msg
+deleteSession session =
+    Http.request
+        { method = "DELETE"
+        , headers = []
+        , url = "/api/sessions/" ++ session.id
+        , expect = Http.expectWhatever DiscardResponse
+        , timeout = Nothing
+        , tracker = Nothing
+        , body = Http.emptyBody
         }
