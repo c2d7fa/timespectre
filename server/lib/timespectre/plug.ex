@@ -26,10 +26,7 @@ defmodule Timespectre.Plug do
   end
 
   get "/api/sessions" do
-    response = query!("SELECT * FROM sessions")
-      |> Enum.map(fn session -> {session[:id], %{:start => session[:start], :end => session[:end]}} end)
-      |> Map.new
-      |> Jason.encode!
+    response = query!("SELECT * FROM sessions ORDER BY end DESC", into: %{}) |> Jason.encode!
     send_resp(conn, 200, response)
   end
 

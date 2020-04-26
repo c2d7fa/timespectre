@@ -38,27 +38,15 @@ init () =
     )
 
 
-
---sessionsDecoder : Json.Decode.Decoder (List Session)
-
-
 sessionsDecoder : Json.Decode.Decoder (List Session)
 sessionsDecoder =
-    Json.Decode.keyValuePairs
-        (Json.Decode.map2
-            (\start end -> { start = start, end = end })
-            (Json.Decode.field "start" Json.Decode.int)
-            (Json.Decode.field "end" Json.Decode.int)
+    Json.Decode.list
+        (Json.Decode.map3
+            (\id start end -> { id = id, start = start, end = end })
+            (Json.Decode.field "id" Json.Decode.string)
+            (Json.Decode.field "start" Json.Decode.int |> Json.Decode.map Time.millisToPosix)
+            (Json.Decode.field "end" Json.Decode.int |> Json.Decode.map Time.millisToPosix)
         )
-        |> Json.Decode.map
-            (List.map
-                (\( id, attrs ) ->
-                    { id = id
-                    , start = Time.millisToPosix attrs.start
-                    , end = Time.millisToPosix attrs.end
-                    }
-                )
-            )
 
 
 requestSessions : Cmd Msg
