@@ -23,7 +23,8 @@ defmodule Timespectre.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.0"},
-      {:sqlitex, "~> 1.7"}
+      {:sqlitex, "~> 1.7"},
+      {:jason, "~> 1.2"}
     ]
   end
 end

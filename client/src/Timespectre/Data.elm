@@ -17,6 +17,6 @@ type alias Session =
 
 idGenerator : Random.Generator String
 idGenerator =
-    Random.list 16 (Random.int (Char.toCode 'a') (Char.toCode 'z'))
+    Random.list 6 (Random.int (Char.toCode 'a') (Char.toCode 'z'))
         |> Random.map (List.map Char.fromCode)
         |> Random.map String.fromList
