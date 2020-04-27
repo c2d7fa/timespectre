@@ -10,31 +10,12 @@ import Timespectre.Model exposing (..)
 
 view : Model -> Html.Html Msg
 view model =
-    Html.div [] [ viewActive model, viewControls model, viewSessions model ]
-
-
-viewActive : Model -> Html.Html Msg
-viewActive model =
-    case model.active of
-        Nothing ->
-            Html.text "No active session."
-
-        Just start ->
-            Html.text ("Active session since " ++ formatTime model.timeZone start)
+    Html.div [] [ viewControls model, viewSessions model ]
 
 
 viewControls : Model -> Html.Html Msg
 viewControls model =
-    let
-        label =
-            case model.active of
-                Nothing ->
-                    "Start"
-
-                Just _ ->
-                    "End"
-    in
-    Html.button [ Ev.onClick ToggleActiveSession ] [ Html.text label ]
+    Html.button [ Ev.onClick StartSession ] [ Html.text "Start" ]
 
 
 viewSessions : Model -> Html.Html Msg
@@ -49,8 +30,12 @@ viewSession : Time.Zone -> Session -> Html.Html Msg
 viewSession zone session =
     Html.div [ Attr.class "session" ]
         [ session.start |> formatTime zone |> Html.text
-        , Html.text " to "
-        , session.end |> formatTime zone |> Html.text
+        , case session.end of
+            Nothing ->
+                Html.button [ Ev.onClick (EndSession session) ] [ Html.text "End" ]
+
+            Just end ->
+                end |> formatTime zone |> (\text -> " to " ++ text) |> Html.text
         , Html.code []
             [ Html.text " (ID="
             , Html.text session.id

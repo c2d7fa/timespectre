@@ -1,5 +1,6 @@
 module Timespectre.API exposing
     ( deleteSession
+    , putEnd
     , putNotes
     , putSession
     , requestSessions
@@ -20,7 +21,7 @@ sessionsDecoder =
             (\id start end notes -> { id = id, start = start, end = end, notes = notes })
             (Json.Decode.field "id" Json.Decode.string)
             (Json.Decode.field "start" Json.Decode.int |> Json.Decode.map Time.millisToPosix)
-            (Json.Decode.field "end" Json.Decode.int |> Json.Decode.map Time.millisToPosix)
+            (Json.Decode.field "end" (Json.Decode.maybe Json.Decode.int) |> Json.Decode.map (Maybe.map Time.millisToPosix))
             (Json.Decode.field "notes" Json.Decode.string)
         )
 
@@ -38,11 +39,31 @@ putSession session =
         , url = "/api/sessions/" ++ session.id
         , body =
             Http.jsonBody
-                (Json.Encode.object
-                    [ ( "start", Json.Encode.int (Time.posixToMillis session.start) )
-                    , ( "end", Json.Encode.int (Time.posixToMillis session.end) )
-                    ]
+                (case session.end of
+                    Nothing ->
+                        Json.Encode.object
+                            [ ( "start", Json.Encode.int (Time.posixToMillis session.start) )
+                            ]
+
+                    Just end ->
+                        Json.Encode.object
+                            [ ( "start", Json.Encode.int (Time.posixToMillis session.start) )
+                            , ( "end", Json.Encode.int (Time.posixToMillis end) )
+                            ]
                 )
+        , expect = Http.expectWhatever DiscardResponse
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+
+putEnd : Session -> Time.Posix -> Cmd Msg
+putEnd session end =
+    Http.request
+        { method = "PUT"
+        , headers = []
+        , url = "/api/sessions/" ++ session.id ++ "/end"
+        , body = end |> Time.posixToMillis |> Json.Encode.int |> Http.jsonBody
         , expect = Http.expectWhatever DiscardResponse
         , timeout = Nothing
         , tracker = Nothing

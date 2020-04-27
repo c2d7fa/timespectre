@@ -1,6 +1,8 @@
 module Timespectre.Data exposing
     ( ActiveSession
     , Session
+    , addSession
+    , endSession
     , idGenerator
     , setNotes
     )
@@ -16,9 +18,26 @@ type alias ActiveSession =
 type alias Session =
     { id : String
     , start : Time.Posix
-    , end : Time.Posix
+    , end : Maybe Time.Posix -- An active session has no end time yet
     , notes : String
     }
+
+
+addSession : String -> Time.Posix -> List Session -> List Session
+addSession id start sessions =
+    { id = id, start = start, end = Nothing, notes = "" } :: sessions
+
+
+endSession : Session -> Time.Posix -> List Session -> List Session
+endSession session end =
+    List.map
+        (\s ->
+            if s.id == session.id then
+                { s | end = Just end }
+
+            else
+                s
+        )
 
 
 setNotes : Session -> String -> List Session -> List Session

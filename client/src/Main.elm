@@ -25,7 +25,6 @@ init () =
     ( { sessions = []
       , timeZone = Time.utc
       , currentTime = Time.millisToPosix 0
-      , active = Nothing
       }
     , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestSessions ]
     )
@@ -39,22 +38,17 @@ subscriptions model =
 update : Msg -> Model -> ( Model, Cmd.Cmd Msg )
 update msg model =
     case msg of
-        ToggleActiveSession ->
-            case model.active of
-                Nothing ->
-                    ( startSession model, Cmd.none )
+        StartSession ->
+            ( model, Random.generate SessionStarted idGenerator )
 
-                Just start ->
-                    ( model, endSession start )
+        SessionStarted id ->
+            ( { model | sessions = addSession id model.currentTime model.sessions }, API.putSession { id = id, start = model.currentTime, end = Nothing, notes = "" } )
 
         SetTimeZone timeZone ->
             ( { model | timeZone = timeZone }, Cmd.none )
 
         SetTime time ->
             ( { model | currentTime = time }, Cmd.none )
-
-        RecordActiveSession start id ->
-            ( recordActiveSession start id model, API.putSession { id = id, start = start, end = model.currentTime, notes = "" } )
 
         DiscardResponse _ ->
             ( model, Cmd.none )
@@ -71,17 +65,5 @@ update msg model =
         SetNotes session notes ->
             ( { model | sessions = setNotes session notes model.sessions }, API.putNotes session notes )
 
-
-startSession : Model -> Model
-startSession model =
-    { model | active = Just model.currentTime }
-
-
-endSession : Time.Posix -> Cmd Msg
-endSession start =
-    Random.generate (RecordActiveSession start) idGenerator
-
-
-recordActiveSession : Time.Posix -> String -> Model -> Model
-recordActiveSession start id model =
-    { model | active = Nothing, sessions = { id = id, start = start, end = model.currentTime, notes = "" } :: model.sessions }
+        EndSession session ->
+            ( { model | sessions = endSession session model.currentTime model.sessions }, API.putEnd session model.currentTime )

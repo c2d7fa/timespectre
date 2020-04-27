@@ -2,20 +2,20 @@ module Timespectre.Model exposing (Model, Msg(..))
 
 import Http
 import Time
-import Timespectre.Data exposing (ActiveSession, Session)
+import Timespectre.Data exposing (Session)
 
 
 type alias Model =
     { sessions : List Session
-    , active : ActiveSession
     , timeZone : Time.Zone
     , currentTime : Time.Posix
     }
 
 
 type Msg
-    = ToggleActiveSession
-    | RecordActiveSession Time.Posix String
+    = StartSession
+    | SessionStarted String
+    | EndSession Session
     | SetTimeZone Time.Zone
     | SetTime Time.Posix
     | DiscardResponse (Result Http.Error ())
