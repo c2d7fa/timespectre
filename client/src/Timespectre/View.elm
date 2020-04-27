@@ -56,6 +56,12 @@ viewSession zone session =
             , Html.text session.id
             , Html.text ")"
             ]
+        , Html.textarea
+            [ Attr.value session.notes
+            , Attr.placeholder "Enter notes here..."
+            , Ev.onInput (SetNotes session)
+            ]
+            []
         , Html.button [ Ev.onClick (DeleteSession session) ] [ Html.text "Delete" ]
         ]
 

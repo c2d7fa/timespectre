@@ -21,3 +21,4 @@ type Msg
     | DiscardResponse (Result Http.Error ())
     | FetchedSessions (Result Http.Error (List Session))
     | DeleteSession Session
+    | SetNotes Session String

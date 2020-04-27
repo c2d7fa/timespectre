@@ -18,6 +18,7 @@ defmodule Timespectre.Plug do
           id TEXT PRIMARY KEY,
           start INTEGER NOT NULL,
           end INTEGER NOT NULL,
+          notes TEXT NOT NULL DEFAULT '',
           deleted INTEGER DEFAULT 0
         )
         """
@@ -29,6 +30,12 @@ defmodule Timespectre.Plug do
     start_time = conn.body_params["start"]
     end_time = conn.body_params["end"]
     query! "INSERT INTO sessions (id, start, end) VALUES (?1, ?2, ?3)", bind: [id, start_time, end_time]
+    send_resp(conn, 200, "")
+  end
+
+  put "/api/sessions/:id/notes" do
+    notes = conn.body_params["_json"]
+    query! "UPDATE sessions SET notes = ?2 WHERE id = ?1", bind: [id, notes]
     send_resp(conn, 200, "")
   end
 
