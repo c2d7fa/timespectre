@@ -22,33 +22,61 @@ viewSessions : Model -> Html.Html Msg
 viewSessions model =
     Html.div []
         [ Html.h1 [] [ Html.text "Sessions" ]
-        , Html.div [] (List.map (viewSession model.timeZone) model.sessions)
+        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model.timeZone) model.sessions)
         ]
 
 
 viewSession : Time.Zone -> Session -> Html.Html Msg
 viewSession zone session =
-    Html.div [ Attr.class "session" ]
-        [ session.start |> formatTime zone |> Html.text
-        , case session.end of
-            Nothing ->
-                Html.button [ Ev.onClick (EndSession session) ] [ Html.text "End" ]
+    Html.li
+        [ Attr.classList [ ( "outer-session", True ), ( "active", isActive session ) ] ]
+        [ Html.div [ Attr.classList [ ( "session", True ), ( "active", isActive session ) ] ]
+            [ Html.div [ Attr.class "time" ]
+                [ viewTime zone session.start
+                , case session.end of
+                    Nothing ->
+                        Html.span [] []
 
-            Just end ->
-                end |> formatTime zone |> (\text -> " to " ++ text) |> Html.text
-        , Html.code []
-            [ Html.text " (ID="
-            , Html.text session.id
-            , Html.text ")"
+                    Just end ->
+                        Html.span [] [ Html.span [ Attr.class "ui-text" ] [ Html.text " to " ], viewTime zone end ]
+                ]
+            , Html.textarea
+                [ Attr.value session.notes
+                , Attr.placeholder "Enter notes here..."
+                , Ev.onInput (SetNotes session)
+                ]
+                []
+            , viewId session
+            , viewSessionControls session
             ]
-        , Html.textarea
-            [ Attr.value session.notes
-            , Attr.placeholder "Enter notes here..."
-            , Ev.onInput (SetNotes session)
-            ]
-            []
-        , Html.button [ Ev.onClick (DeleteSession session) ] [ Html.text "Delete" ]
         ]
+
+
+viewSessionControls : Session -> Html.Html Msg
+viewSessionControls session =
+    case session.end of
+        Nothing ->
+            -- Active session
+            Html.div [ Attr.class "session-controls" ]
+                [ Html.button [ Ev.onClick (EndSession session), Attr.class "end-button" ] [ Html.text "End" ]
+                , Html.button [ Ev.onClick (DeleteSession session), Attr.class "delete-button" ] [ Html.text "Delete" ]
+                ]
+
+        Just _ ->
+            -- Completed session
+            Html.div [ Attr.class "session-controls" ]
+                [ Html.button [ Ev.onClick (DeleteSession session), Attr.class "delete-button" ] [ Html.text "Delete" ]
+                ]
+
+
+viewId : Session -> Html.Html Msg
+viewId session =
+    Html.span [ Attr.class "ui-text id" ] [ Html.text session.id ]
+
+
+viewTime : Time.Zone -> Time.Posix -> Html.Html Msg
+viewTime zone time =
+    Html.time [ Attr.datetime (formatTime zone time) ] [ Html.text (formatTime zone time) ]
 
 
 formatTime : Time.Zone -> Time.Posix -> String

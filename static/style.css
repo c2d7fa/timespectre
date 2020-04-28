@@ -1,0 +1,153 @@
+body {
+  font-family: sans-serif;
+  color: #202020;
+}
+
+/* #region General */
+
+button {
+  background: none;
+  outline: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+
+  cursor: pointer;
+
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+
+  background-color: #00000010;
+  color: #000000c0;
+
+  font-weight: bold;
+
+  transition: background-color 100ms, color 100ms, box-shadow 100ms;
+
+  box-shadow: 0 0 6px transparent;
+}
+
+button:hover {
+  background-color: #00000014;
+}
+
+.ui-text {
+  color: #00000060;
+  cursor: default;
+  font-size: 0.9em;
+  vertical-align: middle;
+}
+
+time {
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+  background-color: hsl(200, 10%, 90%);
+}
+
+/* #endregion */
+
+/* #region Sessions */
+
+.sessions {
+  list-style: none;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sessions li + li {
+  margin-top: 1rem;
+}
+
+.outer-session {
+  padding: 6px;
+  background-color: hsl(200, 10%, 80%);
+}
+
+.outer-session.active {
+  padding: 6px;
+  animation: active-session-background 1s infinite ease-in-out alternate;
+}
+
+.session {
+  display: inline-block;
+  background-color: hsl(200, 15%, 97%);
+  padding: 1rem;
+
+  border-radius: 6px;
+
+  color: #000000e0;
+}
+
+@keyframes active-session-background {
+  from {
+    background-color: hsl(200, 35%, 55%);
+  }
+  to {
+    background-color: hsl(200, 50%, 65%);
+  }
+}
+
+/* #region Session content */
+
+.session > * + * {
+  display: block;
+  margin-top: 1rem;
+}
+
+.session > .ui-text,
+.session > .ui-text + * {
+  margin-top: 0.5rem;
+}
+
+.session textarea {
+  background: none;
+  outline: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+
+  display: block;
+  width: 100%;
+
+  background-color: #00000008;
+  border-radius: 3px;
+
+  padding: 0.5em;
+  box-sizing: border-box;
+
+  height: 4em;
+}
+
+.end-button {
+  color: #ffffff;
+  animation: active-session-background 1s infinite ease-in-out alternate;
+}
+
+.end-button:hover {
+  animation-play-state: paused;
+}
+
+.delete-button:hover {
+  background-color: hsl(10, 50%, 60%);
+  color: #ffffff;
+}
+
+.id {
+  font-family: monospace;
+}
+
+.session-controls {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.session-controls > * + * {
+  margin-left: 0.5rem;
+}
+
+/* #endregion */
+
+/* #endregion */

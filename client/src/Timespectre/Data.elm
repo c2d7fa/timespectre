@@ -4,6 +4,7 @@ module Timespectre.Data exposing
     , addSession
     , endSession
     , idGenerator
+    , isActive
     , setNotes
     )
 
@@ -21,6 +22,16 @@ type alias Session =
     , end : Maybe Time.Posix -- An active session has no end time yet
     , notes : String
     }
+
+
+isActive : Session -> Bool
+isActive session =
+    case session.end of
+        Just _ ->
+            False
+
+        Nothing ->
+            True
 
 
 addSession : String -> Time.Posix -> List Session -> List Session
