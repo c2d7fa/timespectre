@@ -51,7 +51,7 @@ defmodule Timespectre.Plug do
   end
 
   get "/api/sessions" do
-    sessions = query! "SELECT * FROM sessions WHERE deleted = 0 ORDER BY end DESC", into: %{}
+    sessions = query! ~s{SELECT * FROM "sessions" WHERE "deleted" = 0 ORDER BY "end" IS NOT NULL, "end" DESC, "start" DESC}, into: %{}
     send_resp(conn, 200, Jason.encode! sessions)
   end
 
