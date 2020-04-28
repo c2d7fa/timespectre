@@ -44,6 +44,14 @@ time {
   background-color: hsl(200, 10%, 90%);
 }
 
+.duration {
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+  background-color: hsl(40, 75%, 75%);
+  color: hsl(40, 50%, 25%);
+  font-weight: bold;
+}
+
 /* #endregion */
 
 /* #region Sessions */
@@ -133,6 +141,10 @@ time {
 .delete-button:hover {
   background-color: hsl(10, 50%, 60%);
   color: #ffffff;
+}
+
+.session .duration {
+  margin-left: 0.5em;
 }
 
 .id {

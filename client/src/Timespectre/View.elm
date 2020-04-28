@@ -22,12 +22,12 @@ viewSessions : Model -> Html.Html Msg
 viewSessions model =
     Html.div []
         [ Html.h1 [] [ Html.text "Sessions" ]
-        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model.timeZone) model.sessions)
+        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model.currentTime model.timeZone) model.sessions)
         ]
 
 
-viewSession : Time.Zone -> Session -> Html.Html Msg
-viewSession zone session =
+viewSession : Time.Posix -> Time.Zone -> Session -> Html.Html Msg
+viewSession currentTime zone session =
     Html.li
         [ Attr.classList [ ( "outer-session", True ), ( "active", isActive session ) ] ]
         [ Html.div [ Attr.classList [ ( "session", True ), ( "active", isActive session ) ] ]
@@ -39,6 +39,12 @@ viewSession zone session =
 
                     Just end ->
                         Html.span [] [ Html.span [ Attr.class "ui-text" ] [ Html.text " to " ], viewTime zone end ]
+                , case session.end of
+                    Nothing ->
+                        Html.span [ Attr.class "duration" ] [ Html.text (formatDuration (until session.start currentTime)) ]
+
+                    Just end ->
+                        Html.span [ Attr.class "duration" ] [ Html.text (formatDuration (until session.start end)) ]
                 ]
             , Html.textarea
                 [ Attr.value session.notes
