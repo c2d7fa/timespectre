@@ -62,21 +62,32 @@ time {
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
 }
 
-.sessions li + li {
-  margin-top: 1rem;
+.outer-session:first-child {
+  border-radius: 6px 6px 0 0;
+}
+
+.outer-session:last-child {
+  border-radius: 0 0 6px 6px;
 }
 
 .outer-session {
-  padding: 6px;
+  padding: 12px;
   background-color: hsl(200, 10%, 80%);
+
+  max-width: 36rem;
+
+  display: flex;
+  justify-content: center;
 }
 
 .outer-session.active {
-  padding: 6px;
   animation: active-session-background 1s infinite ease-in-out alternate;
+}
+
+.outer-session:not(.active) + .outer-session:not(.active) {
+  padding-top: 0;
 }
 
 .session {
@@ -87,6 +98,7 @@ time {
   border-radius: 6px;
 
   color: #000000e0;
+  width: 100%;
 }
 
 @keyframes active-session-background {
@@ -127,6 +139,8 @@ time {
   box-sizing: border-box;
 
   height: 4em;
+
+  resize: vertical;
 }
 
 .end-button {
