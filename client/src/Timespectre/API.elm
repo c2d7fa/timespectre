@@ -6,21 +6,12 @@ module Timespectre.API exposing
     , requestState
     )
 
-import Dict exposing (Dict)
 import Http
 import Json.Decode
 import Json.Encode
 import Time
-import Timespectre.Data exposing (Session, State)
+import Timespectre.Data exposing (Session)
 import Timespectre.Model exposing (Msg(..))
-
-
-stateDecoder : Json.Decode.Decoder State
-stateDecoder =
-    Json.Decode.map2
-        (\sessions tags -> { sessions = sessions, tags = tags })
-        (Json.Decode.field "sessions" sessionsDecoder)
-        (Json.Decode.field "tags" tagsDecoder)
 
 
 sessionsDecoder : Json.Decode.Decoder (List Session)
@@ -36,21 +27,9 @@ sessionsDecoder =
         )
 
 
-tagsDecoder : Json.Decode.Decoder (Dict String String)
-tagsDecoder =
-    Json.Decode.map Dict.fromList
-        (Json.Decode.list
-            (Json.Decode.map2
-                (\id label -> ( id, label ))
-                (Json.Decode.field "id" Json.Decode.string)
-                (Json.Decode.field "label" Json.Decode.string)
-            )
-        )
-
-
 requestState : Cmd Msg
 requestState =
-    Http.get { url = "/api/state", expect = Http.expectJson FetchedState stateDecoder }
+    Http.get { url = "/api/sessions", expect = Http.expectJson FetchedSessions sessionsDecoder }
 
 
 putSession : Session -> Cmd Msg

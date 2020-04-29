@@ -23,12 +23,12 @@ viewSessions : Model -> Html.Html Msg
 viewSessions model =
     Html.div []
         [ Html.h1 [] [ Html.text "Sessions" ]
-        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model.currentTime model.timeZone model.tags) model.sessions)
+        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model.currentTime model.timeZone) model.sessions)
         ]
 
 
-viewSession : Time.Posix -> Time.Zone -> Dict String String -> Session -> Html.Html Msg
-viewSession currentTime zone tags session =
+viewSession : Time.Posix -> Time.Zone -> Session -> Html.Html Msg
+viewSession currentTime zone session =
     Html.li
         [ Attr.classList [ ( "outer-session", True ), ( "active", isActive session ) ] ]
         [ Html.div [ Attr.classList [ ( "session", True ), ( "active", isActive session ) ] ]
@@ -48,7 +48,7 @@ viewSession currentTime zone tags session =
                         Html.span [ Attr.class "duration" ] [ Html.text (formatDuration (until session.start end)) ]
                 ]
             , Html.span [ Attr.class "tags" ]
-                (List.map (viewTag tags) session.tags)
+                (List.map viewTag session.tags)
             , Html.textarea
                 [ Attr.value session.notes
                 , Attr.placeholder "Enter notes here..."
@@ -61,9 +61,9 @@ viewSession currentTime zone tags session =
         ]
 
 
-viewTag : Dict String String -> String -> Html.Html Msg
-viewTag tags tagId =
-    Html.span [ Attr.class "tag" ] [ Html.text (tagLabel tags tagId) ]
+viewTag : String -> Html.Html Msg
+viewTag tag =
+    Html.span [ Attr.class "tag" ] [ Html.text tag ]
 
 
 viewSessionControls : Session -> Html.Html Msg

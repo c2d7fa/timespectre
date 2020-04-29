@@ -1,26 +1,17 @@
 module Timespectre.Data exposing
     ( Duration
     , Session
-    , State
     , addSession
     , endSession
     , formatDuration
     , idGenerator
     , isActive
     , setNotes
-    , tagLabel
     , until
     )
 
-import Dict exposing (Dict)
 import Random
 import Time
-
-
-type alias State =
-    { sessions : List Session
-    , tags : Dict String String
-    }
 
 
 type alias Duration =
@@ -114,14 +105,3 @@ formatDuration duration =
 
         ( _, _, _ ) ->
             String.fromInt hours ++ "h" ++ String.fromInt minutes ++ "m"
-
-
-tagLabel : Dict String String -> String -> String
-tagLabel tags tagId =
-    Dict.get tagId tags |> Maybe.withDefault ("<" ++ tagId ++ ">")
-
-
-
--- tagLabels : Dict String String -> Session -> List String
--- tagLabels tags session =
---     List.map (tagLabel tags) session.tags
