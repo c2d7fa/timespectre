@@ -51,14 +51,14 @@ time {
 }
 
 .duration {
-  background-color: hsl(40, 75%, 75%);
-  color: hsl(40, 50%, 25%);
+  background-color: hsl(200, 40%, 75%);
+  color: hsl(200, 15%, 15%);
   font-weight: bold;
 }
 
 .tag {
-  background-color: hsl(100, 25%, 75%);
-  color: hsl(100, 10%, 20%);
+  background-color: hsl(40, 75%, 75%);
+  color: hsl(40, 50%, 25%);
   font-weight: bold;
 }
 
