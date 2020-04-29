@@ -39,8 +39,7 @@ button:hover {
 }
 
 time,
-.duration,
-.tag {
+.duration {
   cursor: default;
   padding: 0.2em 0.5em;
   border-radius: 3px;
@@ -58,6 +57,7 @@ time {
 .tag {
   background-color: hsl(40, 75%, 75%);
   color: hsl(40, 50%, 25%);
+  font-weight: normal;
 }
 
 /* #endregion */
@@ -174,9 +174,29 @@ time {
   color: hsl(40, 0%, 60%);
 }
 
+button.tag:hover {
+  background-color: hsl(40, 75%, 80%);
+  color: hsl(40, 20%, 40%);
+}
+
 .add-tag:hover {
   background-color: hsl(40, 75%, 80%);
   color: hsl(40, 50%, 60%);
+}
+
+.editing-tag {
+  outline: none;
+  border: none;
+  background: none;
+  font: inherit;
+
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+
+  width: 8em;
+
+  background-color: hsl(40, 50%, 80%);
+  color: hsl(40, 20%, 25%);
 }
 
 .id {

@@ -26,6 +26,7 @@ init () =
     ( { sessions = []
       , timeZone = Time.utc
       , currentTime = Time.millisToPosix 0
+      , editingTag = Nothing
       }
     , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestState ]
     )
@@ -68,3 +69,25 @@ update msg model =
 
         EndSession session ->
             ( { model | sessions = endSession session model.currentTime model.sessions }, API.putEnd session model.currentTime )
+
+        EditTag session index ->
+            ( { model | editingTag = Just { session = session, index = index, buffer = nthTag session index } }, Cmd.none )
+
+        AddTag session ->
+            ( model, Cmd.none )
+
+        SetEditingTagBuffer buffer ->
+            case model.editingTag of
+                Just inner ->
+                    ( { model | editingTag = Just { inner | buffer = buffer } }, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        SubmitTag ->
+            case model.editingTag of
+                Just inner ->
+                    ( { model | sessions = setNthTagOfSession model.sessions inner.session inner.index inner.buffer, editingTag = Nothing }, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )

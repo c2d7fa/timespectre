@@ -6,7 +6,9 @@ module Timespectre.Data exposing
     , formatDuration
     , idGenerator
     , isActive
+    , nthTag
     , setNotes
+    , setNthTagOfSession
     , until
     )
 
@@ -105,3 +107,21 @@ formatDuration duration =
 
         ( _, _, _ ) ->
             String.fromInt hours ++ "h" ++ String.fromInt minutes ++ "m"
+
+
+nthTag : Session -> Int -> String
+nthTag session index =
+    List.drop index session.tags |> List.head |> Maybe.withDefault "<invalid index>"
+
+
+setNthTagOfSession : List Session -> Session -> Int -> String -> List Session
+setNthTagOfSession sessions session index newTag =
+    List.map
+        (\s ->
+            if s.id == session.id then
+                { s | tags = List.take index s.tags ++ [ newTag ] ++ List.drop (index + 1) s.tags }
+
+            else
+                s
+        )
+        sessions

@@ -1,4 +1,4 @@
-module Timespectre.Model exposing (Model, Msg(..))
+module Timespectre.Model exposing (EditingTag, Model, Msg(..))
 
 import Http
 import Time
@@ -9,6 +9,14 @@ type alias Model =
     { sessions : List Session
     , timeZone : Time.Zone
     , currentTime : Time.Posix
+    , editingTag : Maybe EditingTag
+    }
+
+
+type alias EditingTag =
+    { session : Session
+    , index : Int
+    , buffer : String
     }
 
 
@@ -22,3 +30,7 @@ type Msg
     | FetchedSessions (Result Http.Error (List Session))
     | DeleteSession Session
     | SetNotes Session String
+    | EditTag Session Int
+    | AddTag Session
+    | SetEditingTagBuffer String
+    | SubmitTag
