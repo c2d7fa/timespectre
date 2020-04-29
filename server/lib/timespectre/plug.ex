@@ -11,8 +11,8 @@ defmodule Timespectre.Plug do
 
   def init(_opts) do
     Sqlitex.with_db("test.db", fn db ->
-      # This query may fail. If it does, it probably means that we already
-      # intiailized the database, so we just ignore this case.
+      # These queries may fail. However, if they do, it probably means that we
+      # already intiailized the database, so we just ignore the errors.
       Sqlitex.query db, """
         CREATE TABLE sessions (
           id TEXT PRIMARY KEY,
@@ -21,6 +21,19 @@ defmodule Timespectre.Plug do
           notes TEXT NOT NULL DEFAULT '',
           deleted INTEGER DEFAULT 0
         )
+        """
+        Sqlitex.query db, """
+          CREATE TABLE tags (
+            id TEXT PRIMARY KEY,
+            label TEXT NOT NULL
+          )
+        """
+        Sqlitex.query db, """
+          CREATE TABLE session_tags (
+            session_id TEXT REFERENCES tags(id),
+            tag_id TEXT REFERENCES sessions(id),
+            PRIMARY KEY (session_id, tag_id)
+          )
         """
     end)
     nil
