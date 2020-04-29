@@ -22,18 +22,12 @@ defmodule Timespectre.Plug do
           deleted INTEGER DEFAULT 0
         )
         """
-        Sqlitex.query db, """
-          CREATE TABLE tags (
-            id TEXT PRIMARY KEY,
-            label TEXT NOT NULL
-          )
-        """
-        Sqlitex.query db, """
-          CREATE TABLE session_tags (
-            session_id TEXT REFERENCES tags(id),
-            tag_id TEXT REFERENCES sessions(id),
-            PRIMARY KEY (session_id, tag_id)
-          )
+      Sqlitex.query db, """
+        CREATE TABLE session_tags (
+          session_id TEXT REFERENCES sessions(id),
+          tag TEXT NOT NULL,
+          PRIMARY KEY (session_id, tag)
+        )
         """
     end)
     nil
@@ -64,20 +58,32 @@ defmodule Timespectre.Plug do
   end
 
   get "/api/sessions" do
-    # [TODO] Don't query unnecessary session tags or tags.
+    # [TODO] Don't query unnecessary session tags.
 
-    tags = query! ~s{SELECT * FROM "tags"}, into: %{}
     sessions = query! ~s{SELECT "id", "start", "end", "notes" FROM "sessions" WHERE "deleted" = 0 ORDER BY "end" IS NOT NULL, "end" DESC, "start" DESC}, into: %{}
-    session_tags = query! ~s{SELECT "session_id", "label" FROM "session_tags" JOIN "tags" ON "session_tags"."tag_id" = "tags"."id"}, into: %{}
+    session_tags = query! ~s{SELECT "session_id", "tag" FROM "session_tags"}, into: %{}
 
     sessions_with_tags = Enum.map(sessions, fn session ->
       tags = session_tags
         |> Enum.filter(fn tag -> tag.session_id == session.id end)
-        |> Enum.map(fn tag -> tag.label end)
+        |> Enum.map(fn tag -> tag.tag end)
       Map.put_new(session, :tags, tags)
     end)
 
     send_resp(conn, 200, Jason.encode! sessions_with_tags)
+  end
+
+  # Rename or create tag
+  post "/api/sessions/:id/tags/:tag" do
+    new_tag = conn.body_params["_json"]
+    query! ~s{DELETE FROM "session_tags" WHERE "session_id" = ?1 AND "tag" = ?2}, bind: [id, tag]
+    query! ~s{INSERT OR IGNORE INTO "session_tags"("session_id", "tag") VALUES (?1, ?2)}, bind: [id, new_tag]
+    send_resp(conn, 200, "")
+  end
+
+  delete "/api/sessions/:id/tags/:tag" do
+    query! ~s{DELETE FROM "session_tags" WHERE "session_id" = ?1 AND "tag" = ?2}, bind: [id, tag]
+    send_resp(conn, 200, "")
   end
 
   match _ do

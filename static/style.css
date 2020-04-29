@@ -151,6 +151,10 @@ time {
   resize: vertical;
 }
 
+.session textarea::placeholder {
+  color: #00000040;
+}
+
 .end-button {
   color: #ffffff;
   animation: active-session-background 1s infinite ease-in-out alternate;

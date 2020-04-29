@@ -91,7 +91,7 @@ update msg model =
         SubmitTag ->
             case model.editingTag of
                 Just inner ->
-                    ( { model | sessions = setNthTagOfSession model.sessions inner.session inner.index inner.buffer, editingTag = Nothing }, Cmd.none )
+                    ( { model | sessions = setNthTagOfSession model.sessions inner.session inner.index inner.buffer, editingTag = Nothing }, API.setTag inner.session inner.index inner.buffer )
 
                 Nothing ->
                     ( model, Cmd.none )

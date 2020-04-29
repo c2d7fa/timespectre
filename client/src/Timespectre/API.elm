@@ -4,13 +4,14 @@ module Timespectre.API exposing
     , putNotes
     , putSession
     , requestState
+    , setTag
     )
 
 import Http
 import Json.Decode
 import Json.Encode
 import Time
-import Timespectre.Data exposing (Session)
+import Timespectre.Data exposing (Session, nthTag)
 import Timespectre.Model exposing (Msg(..))
 
 
@@ -95,3 +96,39 @@ deleteSession session =
         , tracker = Nothing
         , body = Http.emptyBody
         }
+
+
+setTag : Session -> Int -> String -> Cmd Msg
+setTag session index newTag =
+    if newTag == "" then
+        Http.request
+            { method = "DELETE"
+            , headers = []
+            , url = "/api/sessions/" ++ session.id ++ "/tags/" ++ nthTag session index
+            , body = Http.emptyBody
+            , expect = Http.expectWhatever DiscardResponse
+            , timeout = Nothing
+            , tracker = Nothing
+            }
+
+    else if index >= List.length session.tags - 1 then
+        Http.request
+            { method = "POST"
+            , headers = []
+            , url = "/api/sessions/" ++ session.id ++ "/tags/" ++ newTag
+            , body = Http.jsonBody (Json.Encode.string newTag)
+            , expect = Http.expectWhatever DiscardResponse
+            , timeout = Nothing
+            , tracker = Nothing
+            }
+
+    else
+        Http.request
+            { method = "POST"
+            , headers = []
+            , url = "/api/sessions/" ++ session.id ++ "/tags/" ++ nthTag session index
+            , body = Http.jsonBody (Json.Encode.string newTag)
+            , expect = Http.expectWhatever DiscardResponse
+            , timeout = Nothing
+            , tracker = Nothing
+            }
