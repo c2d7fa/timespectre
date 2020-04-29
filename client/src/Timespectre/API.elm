@@ -6,30 +6,45 @@ module Timespectre.API exposing
     , requestState
     )
 
+import Dict exposing (Dict)
 import Http
 import Json.Decode
 import Json.Encode
 import Time
-import Timespectre.Data exposing (Session)
-import Timespectre.Model exposing (Msg(..), State)
+import Timespectre.Data exposing (Session, State)
+import Timespectre.Model exposing (Msg(..))
 
 
 stateDecoder : Json.Decode.Decoder State
 stateDecoder =
-    Json.Decode.map
-        (\sessions -> { sessions = sessions })
+    Json.Decode.map2
+        (\sessions tags -> { sessions = sessions, tags = tags })
         (Json.Decode.field "sessions" sessionsDecoder)
+        (Json.Decode.field "tags" tagsDecoder)
 
 
 sessionsDecoder : Json.Decode.Decoder (List Session)
 sessionsDecoder =
     Json.Decode.list
-        (Json.Decode.map4
-            (\id start end notes -> { id = id, start = start, end = end, notes = notes })
+        (Json.Decode.map5
+            (\id start end notes tags -> { id = id, start = start, end = end, notes = notes, tags = tags })
             (Json.Decode.field "id" Json.Decode.string)
             (Json.Decode.field "start" Json.Decode.int |> Json.Decode.map Time.millisToPosix)
             (Json.Decode.field "end" (Json.Decode.maybe Json.Decode.int) |> Json.Decode.map (Maybe.map Time.millisToPosix))
             (Json.Decode.field "notes" Json.Decode.string)
+            (Json.Decode.field "tags" (Json.Decode.list Json.Decode.string))
+        )
+
+
+tagsDecoder : Json.Decode.Decoder (Dict String String)
+tagsDecoder =
+    Json.Decode.map Dict.fromList
+        (Json.Decode.list
+            (Json.Decode.map2
+                (\id label -> ( id, label ))
+                (Json.Decode.field "id" Json.Decode.string)
+                (Json.Decode.field "label" Json.Decode.string)
+            )
         )
 
 

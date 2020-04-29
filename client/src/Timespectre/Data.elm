@@ -1,17 +1,26 @@
 module Timespectre.Data exposing
     ( Duration
     , Session
+    , State
     , addSession
     , endSession
     , formatDuration
     , idGenerator
     , isActive
     , setNotes
+    , tagLabel
     , until
     )
 
+import Dict exposing (Dict)
 import Random
 import Time
+
+
+type alias State =
+    { sessions : List Session
+    , tags : Dict String String
+    }
 
 
 type alias Duration =
@@ -23,6 +32,7 @@ type alias Session =
     , start : Time.Posix
     , end : Maybe Time.Posix -- An active session has no end time yet
     , notes : String
+    , tags : List String
     }
 
 
@@ -38,7 +48,7 @@ isActive session =
 
 addSession : String -> Time.Posix -> List Session -> List Session
 addSession id start sessions =
-    { id = id, start = start, end = Nothing, notes = "" } :: sessions
+    { id = id, start = start, end = Nothing, notes = "", tags = [] } :: sessions
 
 
 endSession : Session -> Time.Posix -> List Session -> List Session
@@ -104,3 +114,14 @@ formatDuration duration =
 
         ( _, _, _ ) ->
             String.fromInt hours ++ "h" ++ String.fromInt minutes ++ "m"
+
+
+tagLabel : Dict String String -> String -> String
+tagLabel tags tagId =
+    Dict.get tagId tags |> Maybe.withDefault ("<" ++ tagId ++ ">")
+
+
+
+-- tagLabels : Dict String String -> Session -> List String
+-- tagLabels tags session =
+--     List.map (tagLabel tags) session.tags

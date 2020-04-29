@@ -1,5 +1,6 @@
 module Timespectre.View exposing (view)
 
+import Dict exposing (..)
 import Html
 import Html.Attributes as Attr
 import Html.Events as Ev
@@ -22,12 +23,12 @@ viewSessions : Model -> Html.Html Msg
 viewSessions model =
     Html.div []
         [ Html.h1 [] [ Html.text "Sessions" ]
-        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model.currentTime model.timeZone) model.sessions)
+        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model.currentTime model.timeZone model.tags) model.sessions)
         ]
 
 
-viewSession : Time.Posix -> Time.Zone -> Session -> Html.Html Msg
-viewSession currentTime zone session =
+viewSession : Time.Posix -> Time.Zone -> Dict String String -> Session -> Html.Html Msg
+viewSession currentTime zone tags session =
     Html.li
         [ Attr.classList [ ( "outer-session", True ), ( "active", isActive session ) ] ]
         [ Html.div [ Attr.classList [ ( "session", True ), ( "active", isActive session ) ] ]
@@ -46,6 +47,8 @@ viewSession currentTime zone session =
                     Just end ->
                         Html.span [ Attr.class "duration" ] [ Html.text (formatDuration (until session.start end)) ]
                 ]
+            , Html.span [ Attr.class "tags" ]
+                (List.map (viewTag tags) session.tags)
             , Html.textarea
                 [ Attr.value session.notes
                 , Attr.placeholder "Enter notes here..."
@@ -56,6 +59,11 @@ viewSession currentTime zone session =
             , viewSessionControls session
             ]
         ]
+
+
+viewTag : Dict String String -> String -> Html.Html Msg
+viewTag tags tagId =
+    Html.span [ Attr.class "tag" ] [ Html.text (tagLabel tags tagId) ]
 
 
 viewSessionControls : Session -> Html.Html Msg

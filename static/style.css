@@ -38,17 +38,27 @@ button:hover {
   vertical-align: middle;
 }
 
-time {
+time,
+.duration,
+.tag {
+  cursor: default;
   padding: 0.2em 0.5em;
   border-radius: 3px;
+}
+
+time {
   background-color: hsl(200, 10%, 90%);
 }
 
 .duration {
-  padding: 0.2em 0.5em;
-  border-radius: 3px;
   background-color: hsl(40, 75%, 75%);
   color: hsl(40, 50%, 25%);
+  font-weight: bold;
+}
+
+.tag {
+  background-color: hsl(100, 25%, 75%);
+  color: hsl(100, 10%, 20%);
   font-weight: bold;
 }
 
@@ -158,6 +168,10 @@ time {
 }
 
 .session .duration {
+  margin-left: 0.5em;
+}
+
+.session .tag + .tag {
   margin-left: 0.5em;
 }
 

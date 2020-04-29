@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Dict
 import Random
 import Task
 import Time
@@ -23,6 +24,7 @@ main =
 init : () -> ( Model, Cmd Msg )
 init () =
     ( { sessions = []
+      , tags = Dict.empty
       , timeZone = Time.utc
       , currentTime = Time.millisToPosix 0
       }
@@ -42,7 +44,7 @@ update msg model =
             ( model, Random.generate SessionStarted idGenerator )
 
         SessionStarted id ->
-            ( { model | sessions = addSession id model.currentTime model.sessions }, API.putSession { id = id, start = model.currentTime, end = Nothing, notes = "" } )
+            ( { model | sessions = addSession id model.currentTime model.sessions }, API.putSession { id = id, start = model.currentTime, end = Nothing, notes = "", tags = [] } )
 
         SetTimeZone timeZone ->
             ( { model | timeZone = timeZone }, Cmd.none )
@@ -57,7 +59,7 @@ update msg model =
             Debug.log "Got error while fetching state" ( model, Cmd.none )
 
         FetchedState (Ok state) ->
-            ( { model | sessions = state.sessions }, Cmd.none )
+            ( { model | sessions = state.sessions, tags = state.tags }, Cmd.none )
 
         DeleteSession session ->
             ( { model | sessions = List.filter (\s -> s.id /= session.id) model.sessions }, API.deleteSession session )
