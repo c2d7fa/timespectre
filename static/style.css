@@ -17,7 +17,7 @@ button {
   padding: 0.2em 0.5em;
   border-radius: 3px;
 
-  background-color: #00000010;
+  background-color: #00000014;
   color: #000000c0;
 
   font-weight: bold;
@@ -28,7 +28,7 @@ button {
 }
 
 button:hover {
-  background-color: #00000014;
+  background-color: #00000020;
 }
 
 .ui-text {
@@ -53,13 +53,11 @@ time {
 .duration {
   background-color: hsl(200, 40%, 75%);
   color: hsl(200, 15%, 15%);
-  font-weight: bold;
 }
 
 .tag {
   background-color: hsl(40, 75%, 75%);
   color: hsl(40, 50%, 25%);
-  font-weight: bold;
 }
 
 /* #endregion */
