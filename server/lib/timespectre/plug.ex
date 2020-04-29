@@ -63,9 +63,21 @@ defmodule Timespectre.Plug do
     send_resp(conn, 200, "")
   end
 
-  get "/api/sessions" do
+  get "/api/state" do
+    # [TODO] Don't query unnecessary session tags or tags.
+
+    tags = query! ~s{SELECT * FROM "tags"}, into: %{}
     sessions = query! ~s{SELECT * FROM "sessions" WHERE "deleted" = 0 ORDER BY "end" IS NOT NULL, "end" DESC, "start" DESC}, into: %{}
-    send_resp(conn, 200, Jason.encode! sessions)
+    session_tags = query! ~s{SELECT * FROM "session_tags"}, into: %{}
+
+    sessions_with_tags = Enum.map(sessions, fn session ->
+      tags = session_tags
+        |> Enum.filter(fn tag -> tag.session_id == session.id end)
+        |> Enum.map(fn tag -> tag.tag_id end)
+      Map.put_new(session, :tags, tags)
+    end)
+
+    send_resp(conn, 200, Jason.encode! %{tags: tags, sessions: sessions_with_tags})
   end
 
   match _ do

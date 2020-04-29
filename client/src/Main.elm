@@ -26,7 +26,7 @@ init () =
       , timeZone = Time.utc
       , currentTime = Time.millisToPosix 0
       }
-    , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestSessions ]
+    , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestState ]
     )
 
 
@@ -53,11 +53,11 @@ update msg model =
         DiscardResponse _ ->
             ( model, Cmd.none )
 
-        FetchedSessions (Err _) ->
-            Debug.log "Got error while fetching sessions" ( model, Cmd.none )
+        FetchedState (Err _) ->
+            Debug.log "Got error while fetching state" ( model, Cmd.none )
 
-        FetchedSessions (Ok sessions) ->
-            ( { model | sessions = sessions }, Cmd.none )
+        FetchedState (Ok state) ->
+            ( { model | sessions = state.sessions }, Cmd.none )
 
         DeleteSession session ->
             ( { model | sessions = List.filter (\s -> s.id /= session.id) model.sessions }, API.deleteSession session )

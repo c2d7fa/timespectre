@@ -1,8 +1,12 @@
-module Timespectre.Model exposing (Model, Msg(..))
+module Timespectre.Model exposing (Model, Msg(..), State)
 
 import Http
 import Time
 import Timespectre.Data exposing (Session)
+
+
+type alias State =
+    { sessions : List Session }
 
 
 type alias Model =
@@ -19,6 +23,6 @@ type Msg
     | SetTimeZone Time.Zone
     | SetTime Time.Posix
     | DiscardResponse (Result Http.Error ())
-    | FetchedSessions (Result Http.Error (List Session))
+    | FetchedState (Result Http.Error State)
     | DeleteSession Session
     | SetNotes Session String

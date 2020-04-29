@@ -3,7 +3,7 @@ module Timespectre.API exposing
     , putEnd
     , putNotes
     , putSession
-    , requestSessions
+    , requestState
     )
 
 import Http
@@ -11,7 +11,14 @@ import Json.Decode
 import Json.Encode
 import Time
 import Timespectre.Data exposing (Session)
-import Timespectre.Model exposing (Msg(..))
+import Timespectre.Model exposing (Msg(..), State)
+
+
+stateDecoder : Json.Decode.Decoder State
+stateDecoder =
+    Json.Decode.map
+        (\sessions -> { sessions = sessions })
+        (Json.Decode.field "sessions" sessionsDecoder)
 
 
 sessionsDecoder : Json.Decode.Decoder (List Session)
@@ -26,9 +33,9 @@ sessionsDecoder =
         )
 
 
-requestSessions : Cmd Msg
-requestSessions =
-    Http.get { url = "/api/sessions", expect = Http.expectJson FetchedSessions sessionsDecoder }
+requestState : Cmd Msg
+requestState =
+    Http.get { url = "/api/state", expect = Http.expectJson FetchedState stateDecoder }
 
 
 putSession : Session -> Cmd Msg
