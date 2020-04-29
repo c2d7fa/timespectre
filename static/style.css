@@ -165,12 +165,22 @@ time {
   color: #ffffff;
 }
 
-.session .duration {
+.session .duration,
+.session .tags > * + * {
   margin-left: 0.5em;
 }
 
-.session .tag + .tag {
-  margin-left: 0.5em;
+.add-tag:not(:only-child) {
+  color: hsl(40, 0%, 60%);
+}
+
+.add-tag:hover {
+  /* background-color: hsl(40, 75%, 75%); */
+  background-color: hsl(40, 75%, 80%);
+}
+
+.add-tag:not(:only-child):hover {
+  color: hsl(40, 50%, 60%);
 }
 
 .id {

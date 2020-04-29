@@ -48,7 +48,9 @@ viewSession currentTime zone session =
                         Html.span [ Attr.class "duration" ] [ Html.text (formatDuration (until session.start end)) ]
                 ]
             , Html.span [ Attr.class "tags" ]
-                (List.map viewTag session.tags)
+                (List.map viewTag session.tags
+                    ++ [ viewAddTagButton session ]
+                )
             , Html.textarea
                 [ Attr.value session.notes
                 , Attr.placeholder "Enter notes here..."
@@ -64,6 +66,17 @@ viewSession currentTime zone session =
 viewTag : String -> Html.Html Msg
 viewTag tag =
     Html.span [ Attr.class "tag" ] [ Html.text tag ]
+
+
+viewAddTagButton : Session -> Html.Html Msg
+viewAddTagButton session =
+    Html.button [ Attr.class "add-tag" ]
+        [ if List.isEmpty session.tags then
+            Html.text "Add Tag"
+
+          else
+            Html.text "+"
+        ]
 
 
 viewSessionControls : Session -> Html.Html Msg
