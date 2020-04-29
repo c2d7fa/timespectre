@@ -7,11 +7,16 @@ import Html.Events as Ev
 import Time
 import Timespectre.Data exposing (..)
 import Timespectre.Model exposing (..)
+import Timespectre.View.Timeline exposing (viewTimeline)
 
 
 view : Model -> Html.Html Msg
 view model =
-    Html.div [] [ viewControls model, viewSessions model ]
+    Html.div []
+        [ viewTimeline model
+        , viewControls model
+        , viewSessions model
+        ]
 
 
 viewControls : Model -> Html.Html Msg

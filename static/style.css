@@ -219,3 +219,21 @@ button.tag:hover {
 /* #endregion */
 
 /* #endregion */
+
+.timeline .segment {
+  fill: hsl(200, 50%, 60%);
+}
+
+.timeline .active-segment {
+  fill: hsl(200, 50%, 60%);
+  animation: active-segment-fill infinite alternate ease-in-out 1s;
+}
+
+@keyframes active-segment-fill {
+  from {
+    fill: hsl(200, 50%, 50%);
+  }
+  to {
+    fill: hsl(200, 80%, 70%);
+  }
+}
