@@ -74,7 +74,11 @@ update msg model =
             ( { model | editingTag = Just { session = session, index = index, buffer = nthTag session index } }, Cmd.none )
 
         AddTag session ->
-            ( model, Cmd.none )
+            let
+                ( sessions, newSession, index ) =
+                    addTag model.sessions session "tag"
+            in
+            update (EditTag newSession index) { model | sessions = sessions }
 
         SetEditingTagBuffer buffer ->
             case model.editingTag of

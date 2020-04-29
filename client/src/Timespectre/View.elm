@@ -79,7 +79,7 @@ viewTag editingTag session index =
             else
                 viewStaticTag session index
 
-        _ ->
+        Nothing ->
             viewStaticTag session index
 
 

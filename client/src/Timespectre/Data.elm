@@ -2,6 +2,7 @@ module Timespectre.Data exposing
     ( Duration
     , Session
     , addSession
+    , addTag
     , endSession
     , formatDuration
     , idGenerator
@@ -119,9 +120,39 @@ setNthTagOfSession sessions session index newTag =
     List.map
         (\s ->
             if s.id == session.id then
-                { s | tags = List.take index s.tags ++ [ newTag ] ++ List.drop (index + 1) s.tags }
+                { s
+                    | tags =
+                        List.take index s.tags
+                            ++ (if newTag == "" then
+                                    []
+
+                                else
+                                    [ newTag ]
+                               )
+                            ++ List.drop (index + 1) s.tags
+                }
 
             else
                 s
         )
         sessions
+
+
+addTag : List Session -> Session -> String -> ( List Session, Session, Int )
+addTag sessions session newTag =
+    let
+        newSession =
+            { session | tags = session.tags ++ [ newTag ] }
+    in
+    ( List.map
+        (\s ->
+            if s.id == session.id then
+                newSession
+
+            else
+                s
+        )
+        sessions
+    , newSession
+    , List.length newSession.tags - 1
+    )
