@@ -70,13 +70,7 @@ viewTag tag =
 
 viewAddTagButton : Session -> Html.Html Msg
 viewAddTagButton session =
-    Html.button [ Attr.class "add-tag" ]
-        [ if List.isEmpty session.tags then
-            Html.text "Add Tag"
-
-          else
-            Html.text "+"
-        ]
+    Html.button [ Attr.class "add-tag" ] [ Html.text "+" ]
 
 
 viewSessionControls : Session -> Html.Html Msg
