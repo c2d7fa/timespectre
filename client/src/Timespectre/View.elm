@@ -12,24 +12,24 @@ import Timespectre.View.Timeline exposing (viewTimeline)
 
 view : Model -> Html.Html Msg
 view model =
-    Html.div []
+    Html.div [ Attr.class "main-container" ]
         [ viewTimeline model
-        , viewControls model
-        , viewSessions model
+        , viewSidebar model
+        , Html.div [ Attr.class "main-view" ] [ viewSessions model ]
         ]
 
 
-viewControls : Model -> Html.Html Msg
-viewControls model =
-    Html.button [ Ev.onClick StartSession ] [ Html.text "Start" ]
+viewSidebar : Model -> Html.Html Msg
+viewSidebar model =
+    Html.ul [ Attr.class "sidebar" ]
+        [ Html.li [] [ Html.button [ Ev.onClick StartSession ] [ Html.text "Start Session" ] ]
+        , Html.li [] [ Html.text "Sessions" ]
+        ]
 
 
 viewSessions : Model -> Html.Html Msg
 viewSessions model =
-    Html.div []
-        [ Html.h1 [] [ Html.text "Sessions" ]
-        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model) model.sessions)
-        ]
+    Html.ul [ Attr.class "sessions" ] (List.map (viewSession model) model.sessions)
 
 
 viewSession : Model -> Session -> Html.Html Msg

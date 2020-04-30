@@ -17,7 +17,7 @@ viewTimeline model =
 
 svgTimeline : Model -> Html.Html Msg
 svgTimeline model =
-    Svg.svg [ Attr.width "100%", Attr.height "40" ]
+    Svg.svg [ Attr.width "100%", Attr.height "100%" ]
         ([ svgLine, svgTicks ]
             ++ (model.sessions
                     |> List.filter
