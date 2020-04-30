@@ -88,7 +88,7 @@ segment currentTime { start, end } =
 
 timelineLengthMs : Int
 timelineLengthMs =
-    1000 * 60 * 60 * 4
+    1000 * 60 * 60 * 6
 
 
 durationLengthRatio : Duration -> Float
