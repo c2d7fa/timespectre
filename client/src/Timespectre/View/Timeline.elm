@@ -7,6 +7,7 @@ import Svg.Attributes as Attr
 import Time
 import Timespectre.Data exposing (..)
 import Timespectre.Model exposing (Model, Msg(..))
+import Timespectre.Util exposing (divisibleBy, rangeBy)
 
 
 viewTimeline : Model -> Html.Html Msg
@@ -16,13 +17,41 @@ viewTimeline model =
 
 svgTimeline : Model -> Html.Html Msg
 svgTimeline model =
-    Svg.svg [ Attr.width "100%", Attr.height "20" ]
-        [ svgSegment model.currentTime 0 (List.head model.sessions |> Maybe.withDefault { start = Time.millisToPosix 0, end = Nothing, id = "error", notes = "", tags = [] })
+    Svg.svg [ Attr.width "100%", Attr.height "40" ]
+        [ svgLine
+        , svgTicks
+        , svgSegment model.currentTime (List.head model.sessions |> Maybe.withDefault { start = Time.millisToPosix 0, end = Nothing, id = "error", notes = "", tags = [] })
         ]
 
 
-svgSegment : Time.Posix -> Int -> Session -> Svg.Svg Msg
-svgSegment currentTime offset session =
+svgTicks : Svg.Svg Msg
+svgTicks =
+    Svg.g []
+        (rangeBy 0 timelineLengthMs (1000 * 60 * 15)
+            |> List.map (\x -> svgTick (durationLength { ms = x }) (divisibleBy (1000 * 60 * 60) x))
+        )
+
+
+svgTick : String -> Bool -> Svg.Svg Msg
+svgTick x large =
+    let
+        props =
+            if large then
+                [ Attr.y "25%", Attr.height "50%" ]
+
+            else
+                [ Attr.y "35%", Attr.height "30%" ]
+    in
+    Svg.rect ([ Attr.x x, Attr.width "1px", Attr.fill "#e0e0e0" ] ++ props) []
+
+
+svgLine : Svg.Svg Msg
+svgLine =
+    Svg.rect [ Attr.x "0%", Attr.width "100%", Attr.y "50%", Attr.height "1px", Attr.fill "#f0f0f0" ] []
+
+
+svgSegment : Time.Posix -> Session -> Svg.Svg Msg
+svgSegment currentTime session =
     let
         end =
             Maybe.withDefault currentTime session.end
@@ -31,13 +60,13 @@ svgSegment currentTime offset session =
             segment currentTime { start = session.start, end = end }
 
         active =
-            session.end |> Maybe.map (\x -> True) |> Maybe.withDefault False
+            session.end |> Maybe.map (\x -> False) |> Maybe.withDefault True
     in
     Svg.rect
-        [ Attr.height (20 * offset |> String.fromInt |> (\x -> x ++ "%"))
+        [ Attr.y "40%"
         , Attr.x sessionSegment.x
         , Attr.width sessionSegment.width
-        , Attr.height "12"
+        , Attr.height "20%"
         , Attr.rx "3"
         , Attr.class
             (if active then
