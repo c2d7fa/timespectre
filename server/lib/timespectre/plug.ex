@@ -11,8 +11,8 @@ defmodule Timespectre.Plug do
 
   def init(_opts) do
     Sqlitex.with_db("test.db", fn db ->
-      # This query may fail. If it does, it probably means that we already
-      # intiailized the database, so we just ignore this case.
+      # These queries may fail. However, if they do, it probably means that we
+      # already intiailized the database, so we just ignore the errors.
       Sqlitex.query db, """
         CREATE TABLE sessions (
           id TEXT PRIMARY KEY,
@@ -20,6 +20,13 @@ defmodule Timespectre.Plug do
           end INTEGER,
           notes TEXT NOT NULL DEFAULT '',
           deleted INTEGER DEFAULT 0
+        )
+        """
+      Sqlitex.query db, """
+        CREATE TABLE session_tags (
+          session_id TEXT REFERENCES sessions(id),
+          tag TEXT NOT NULL,
+          PRIMARY KEY (session_id, tag)
         )
         """
     end)
@@ -51,8 +58,32 @@ defmodule Timespectre.Plug do
   end
 
   get "/api/sessions" do
-    sessions = query! ~s{SELECT * FROM "sessions" WHERE "deleted" = 0 ORDER BY "end" IS NOT NULL, "end" DESC, "start" DESC}, into: %{}
-    send_resp(conn, 200, Jason.encode! sessions)
+    # [TODO] Don't query unnecessary session tags.
+
+    sessions = query! ~s{SELECT "id", "start", "end", "notes" FROM "sessions" WHERE "deleted" = 0 ORDER BY "end" IS NOT NULL, "end" DESC, "start" DESC}, into: %{}
+    session_tags = query! ~s{SELECT "session_id", "tag" FROM "session_tags"}, into: %{}
+
+    sessions_with_tags = Enum.map(sessions, fn session ->
+      tags = session_tags
+        |> Enum.filter(fn tag -> tag.session_id == session.id end)
+        |> Enum.map(fn tag -> tag.tag end)
+      Map.put_new(session, :tags, tags)
+    end)
+
+    send_resp(conn, 200, Jason.encode! sessions_with_tags)
+  end
+
+  # Rename or create tag
+  post "/api/sessions/:id/tags/:tag" do
+    new_tag = conn.body_params["_json"]
+    query! ~s{DELETE FROM "session_tags" WHERE "session_id" = ?1 AND "tag" = ?2}, bind: [id, tag]
+    query! ~s{INSERT OR IGNORE INTO "session_tags"("session_id", "tag") VALUES (?1, ?2)}, bind: [id, new_tag]
+    send_resp(conn, 200, "")
+  end
+
+  delete "/api/sessions/:id/tags/:tag" do
+    query! ~s{DELETE FROM "session_tags" WHERE "session_id" = ?1 AND "tag" = ?2}, bind: [id, tag]
+    send_resp(conn, 200, "")
   end
 
   match _ do

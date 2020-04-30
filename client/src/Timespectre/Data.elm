@@ -2,11 +2,14 @@ module Timespectre.Data exposing
     ( Duration
     , Session
     , addSession
+    , addTag
     , endSession
     , formatDuration
     , idGenerator
     , isActive
+    , nthTag
     , setNotes
+    , setNthTagOfSession
     , until
     )
 
@@ -23,6 +26,7 @@ type alias Session =
     , start : Time.Posix
     , end : Maybe Time.Posix -- An active session has no end time yet
     , notes : String
+    , tags : List String
     }
 
 
@@ -38,7 +42,7 @@ isActive session =
 
 addSession : String -> Time.Posix -> List Session -> List Session
 addSession id start sessions =
-    { id = id, start = start, end = Nothing, notes = "" } :: sessions
+    { id = id, start = start, end = Nothing, notes = "", tags = [] } :: sessions
 
 
 endSession : Session -> Time.Posix -> List Session -> List Session
@@ -104,3 +108,51 @@ formatDuration duration =
 
         ( _, _, _ ) ->
             String.fromInt hours ++ "h" ++ String.fromInt minutes ++ "m"
+
+
+nthTag : Session -> Int -> String
+nthTag session index =
+    List.drop index session.tags |> List.head |> Maybe.withDefault "<invalid index>"
+
+
+setNthTagOfSession : List Session -> Session -> Int -> String -> List Session
+setNthTagOfSession sessions session index newTag =
+    List.map
+        (\s ->
+            if s.id == session.id then
+                { s
+                    | tags =
+                        List.take index s.tags
+                            ++ (if newTag == "" then
+                                    []
+
+                                else
+                                    [ newTag ]
+                               )
+                            ++ List.drop (index + 1) s.tags
+                }
+
+            else
+                s
+        )
+        sessions
+
+
+addTag : List Session -> Session -> String -> ( List Session, Session, Int )
+addTag sessions session newTag =
+    let
+        newSession =
+            { session | tags = session.tags ++ [ newTag ] }
+    in
+    ( List.map
+        (\s ->
+            if s.id == session.id then
+                newSession
+
+            else
+                s
+        )
+        sessions
+    , newSession
+    , List.length newSession.tags - 1
+    )

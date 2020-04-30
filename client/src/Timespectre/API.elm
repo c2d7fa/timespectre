@@ -3,31 +3,33 @@ module Timespectre.API exposing
     , putEnd
     , putNotes
     , putSession
-    , requestSessions
+    , requestState
+    , setTag
     )
 
 import Http
 import Json.Decode
 import Json.Encode
 import Time
-import Timespectre.Data exposing (Session)
+import Timespectre.Data exposing (Session, nthTag)
 import Timespectre.Model exposing (Msg(..))
 
 
 sessionsDecoder : Json.Decode.Decoder (List Session)
 sessionsDecoder =
     Json.Decode.list
-        (Json.Decode.map4
-            (\id start end notes -> { id = id, start = start, end = end, notes = notes })
+        (Json.Decode.map5
+            (\id start end notes tags -> { id = id, start = start, end = end, notes = notes, tags = tags })
             (Json.Decode.field "id" Json.Decode.string)
             (Json.Decode.field "start" Json.Decode.int |> Json.Decode.map Time.millisToPosix)
             (Json.Decode.field "end" (Json.Decode.maybe Json.Decode.int) |> Json.Decode.map (Maybe.map Time.millisToPosix))
             (Json.Decode.field "notes" Json.Decode.string)
+            (Json.Decode.field "tags" (Json.Decode.list Json.Decode.string))
         )
 
 
-requestSessions : Cmd Msg
-requestSessions =
+requestState : Cmd Msg
+requestState =
     Http.get { url = "/api/sessions", expect = Http.expectJson FetchedSessions sessionsDecoder }
 
 
@@ -94,3 +96,39 @@ deleteSession session =
         , tracker = Nothing
         , body = Http.emptyBody
         }
+
+
+setTag : Session -> Int -> String -> Cmd Msg
+setTag session index newTag =
+    if newTag == "" then
+        Http.request
+            { method = "DELETE"
+            , headers = []
+            , url = "/api/sessions/" ++ session.id ++ "/tags/" ++ nthTag session index
+            , body = Http.emptyBody
+            , expect = Http.expectWhatever DiscardResponse
+            , timeout = Nothing
+            , tracker = Nothing
+            }
+
+    else if index >= List.length session.tags - 1 then
+        Http.request
+            { method = "POST"
+            , headers = []
+            , url = "/api/sessions/" ++ session.id ++ "/tags/" ++ newTag
+            , body = Http.jsonBody (Json.Encode.string newTag)
+            , expect = Http.expectWhatever DiscardResponse
+            , timeout = Nothing
+            , tracker = Nothing
+            }
+
+    else
+        Http.request
+            { method = "POST"
+            , headers = []
+            , url = "/api/sessions/" ++ session.id ++ "/tags/" ++ nthTag session index
+            , body = Http.jsonBody (Json.Encode.string newTag)
+            , expect = Http.expectWhatever DiscardResponse
+            , timeout = Nothing
+            , tracker = Nothing
+            }

@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Dict
 import Random
 import Task
 import Time
@@ -25,8 +26,9 @@ init () =
     ( { sessions = []
       , timeZone = Time.utc
       , currentTime = Time.millisToPosix 0
+      , editingTag = Nothing
       }
-    , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestSessions ]
+    , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestState ]
     )
 
 
@@ -42,7 +44,7 @@ update msg model =
             ( model, Random.generate SessionStarted idGenerator )
 
         SessionStarted id ->
-            ( { model | sessions = addSession id model.currentTime model.sessions }, API.putSession { id = id, start = model.currentTime, end = Nothing, notes = "" } )
+            ( { model | sessions = addSession id model.currentTime model.sessions }, API.putSession { id = id, start = model.currentTime, end = Nothing, notes = "", tags = [] } )
 
         SetTimeZone timeZone ->
             ( { model | timeZone = timeZone }, Cmd.none )
@@ -54,7 +56,7 @@ update msg model =
             ( model, Cmd.none )
 
         FetchedSessions (Err _) ->
-            Debug.log "Got error while fetching sessions" ( model, Cmd.none )
+            Debug.log "Got error while fetching state" ( model, Cmd.none )
 
         FetchedSessions (Ok sessions) ->
             ( { model | sessions = sessions }, Cmd.none )
@@ -67,3 +69,29 @@ update msg model =
 
         EndSession session ->
             ( { model | sessions = endSession session model.currentTime model.sessions }, API.putEnd session model.currentTime )
+
+        EditTag session index ->
+            ( { model | editingTag = Just { session = session, index = index, buffer = nthTag session index } }, Cmd.none )
+
+        AddTag session ->
+            let
+                ( sessions, newSession, index ) =
+                    addTag model.sessions session "tag"
+            in
+            update (EditTag newSession index) { model | sessions = sessions }
+
+        SetEditingTagBuffer buffer ->
+            case model.editingTag of
+                Just inner ->
+                    ( { model | editingTag = Just { inner | buffer = buffer } }, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        SubmitTag ->
+            case model.editingTag of
+                Just inner ->
+                    ( { model | sessions = setNthTagOfSession model.sessions inner.session inner.index inner.buffer, editingTag = Nothing }, API.setTag inner.session inner.index inner.buffer )
+
+                Nothing ->
+                    ( model, Cmd.none )

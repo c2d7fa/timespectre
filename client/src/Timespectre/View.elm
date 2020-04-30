@@ -1,5 +1,6 @@
 module Timespectre.View exposing (view)
 
+import Dict exposing (..)
 import Html
 import Html.Attributes as Attr
 import Html.Events as Ev
@@ -22,30 +23,34 @@ viewSessions : Model -> Html.Html Msg
 viewSessions model =
     Html.div []
         [ Html.h1 [] [ Html.text "Sessions" ]
-        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model.currentTime model.timeZone) model.sessions)
+        , Html.ul [ Attr.class "sessions" ] (List.map (viewSession model) model.sessions)
         ]
 
 
-viewSession : Time.Posix -> Time.Zone -> Session -> Html.Html Msg
-viewSession currentTime zone session =
+viewSession : Model -> Session -> Html.Html Msg
+viewSession model session =
     Html.li
         [ Attr.classList [ ( "outer-session", True ), ( "active", isActive session ) ] ]
         [ Html.div [ Attr.classList [ ( "session", True ), ( "active", isActive session ) ] ]
             [ Html.div [ Attr.class "time" ]
-                [ viewTime zone session.start
+                [ viewTime model.timeZone session.start
                 , case session.end of
                     Nothing ->
                         Html.span [] []
 
                     Just end ->
-                        Html.span [] [ Html.span [ Attr.class "ui-text" ] [ Html.text " to " ], viewTime zone end ]
+                        Html.span [] [ Html.span [ Attr.class "ui-text" ] [ Html.text " to " ], viewTime model.timeZone end ]
                 , case session.end of
                     Nothing ->
-                        Html.span [ Attr.class "duration" ] [ Html.text (formatDuration (until session.start currentTime)) ]
+                        Html.span [ Attr.class "duration" ] [ Html.text (formatDuration (until session.start model.currentTime)) ]
 
                     Just end ->
                         Html.span [ Attr.class "duration" ] [ Html.text (formatDuration (until session.start end)) ]
                 ]
+            , Html.span [ Attr.class "tags" ]
+                (List.map (viewTag model.editingTag session) (List.range 0 (List.length session.tags - 1))
+                    ++ [ viewAddTagButton session ]
+                )
             , Html.textarea
                 [ Attr.value session.notes
                 , Attr.placeholder "Enter notes here..."
@@ -56,6 +61,44 @@ viewSession currentTime zone session =
             , viewSessionControls session
             ]
         ]
+
+
+viewTag : Maybe EditingTag -> Session -> Int -> Html.Html Msg
+viewTag editingTag session index =
+    case editingTag of
+        Just inner ->
+            if ( inner.session, inner.index ) == ( session, index ) then
+                Html.input
+                    [ Attr.class "editing-tag"
+                    , Ev.onInput SetEditingTagBuffer
+                    , Attr.value inner.buffer
+                    , Ev.onBlur SubmitTag
+                    ]
+                    []
+
+            else
+                viewStaticTag session index
+
+        Nothing ->
+            viewStaticTag session index
+
+
+viewStaticTag : Session -> Int -> Html.Html Msg
+viewStaticTag session index =
+    Html.button
+        [ Attr.class "tag"
+        , Ev.onClick (EditTag session index)
+        ]
+        [ Html.text (nthTag session index) ]
+
+
+viewAddTagButton : Session -> Html.Html Msg
+viewAddTagButton session =
+    Html.button
+        [ Attr.class "add-tag"
+        , Ev.onClick (AddTag session)
+        ]
+        [ Html.text "+" ]
 
 
 viewSessionControls : Session -> Html.Html Msg
