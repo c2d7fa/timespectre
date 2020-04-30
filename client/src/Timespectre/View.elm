@@ -62,7 +62,6 @@ viewSession model session =
                 , Ev.onInput (SetNotes session)
                 ]
                 []
-            , viewId session
             , viewSessionControls session
             ]
         ]
@@ -121,11 +120,6 @@ viewSessionControls session =
             Html.div [ Attr.class "session-controls" ]
                 [ Html.button [ Ev.onClick (DeleteSession session), Attr.class "delete-button" ] [ Html.text "Delete" ]
                 ]
-
-
-viewId : Session -> Html.Html Msg
-viewId session =
-    Html.span [ Attr.class "ui-text id" ] [ Html.text session.id ]
 
 
 viewTime : Time.Zone -> Time.Posix -> Html.Html Msg

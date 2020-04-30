@@ -126,7 +126,7 @@ time {
 
 .outer-session {
   padding: 12px;
-  background-color: hsl(200, 10%, 80%);
+  background-color: hsl(200, 10%, 90%);
 
   display: flex;
   justify-content: center;
@@ -243,10 +243,6 @@ button.tag:hover {
 
   background-color: hsl(40, 50%, 80%);
   color: hsl(40, 20%, 25%);
-}
-
-.id {
-  font-family: monospace;
 }
 
 .session-controls {
