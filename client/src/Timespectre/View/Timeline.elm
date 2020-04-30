@@ -28,9 +28,10 @@ countOverlaps model session =
             (\s ->
                 s.end
                     |> Maybe.withDefault model.currentTime
-                    |> isAfter (session.end |> Maybe.withDefault model.currentTime)
+                    |> isAfter session.start
             )
-        |> List.filter (\s -> session.start |> isAfter s.start)
+        |> List.filter
+            (\s -> session.start |> isAfter s.start)
         |> List.length
         |> (\n -> n - 1)
 
