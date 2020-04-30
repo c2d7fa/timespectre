@@ -7,7 +7,7 @@ import Svg.Attributes as Attr
 import Time
 import Timespectre.Data exposing (..)
 import Timespectre.Model exposing (Model, Msg(..))
-import Timespectre.Util exposing (divisibleBy, rangeBy)
+import Timespectre.Util exposing (divisibleBy, isAfter, rangeBy)
 
 
 viewTimeline : Model -> Html.Html Msg
@@ -18,10 +18,13 @@ viewTimeline model =
 svgTimeline : Model -> Html.Html Msg
 svgTimeline model =
     Svg.svg [ Attr.width "100%", Attr.height "40" ]
-        [ svgLine
-        , svgTicks
-        , svgSegment model.currentTime (List.head model.sessions |> Maybe.withDefault { start = Time.millisToPosix 0, end = Nothing, id = "error", notes = "", tags = [] })
-        ]
+        ([ svgLine, svgTicks ]
+            ++ (model.sessions
+                    |> List.filter
+                        (\session -> session.end |> Maybe.map (isAfter (originTime model.currentTime)) |> Maybe.withDefault True)
+                    |> List.map (svgSegment model.currentTime)
+               )
+        )
 
 
 svgTicks : Svg.Svg Msg
@@ -89,6 +92,11 @@ segment currentTime { start, end } =
 timelineLengthMs : Int
 timelineLengthMs =
     1000 * 60 * 60 * 6
+
+
+originTime : Time.Posix -> Time.Posix
+originTime currentTime =
+    Time.millisToPosix (Time.posixToMillis currentTime - timelineLengthMs)
 
 
 durationLengthRatio : Duration -> Float
