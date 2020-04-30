@@ -18,13 +18,32 @@ viewTimeline model =
 svgTimeline : Model -> Html.Html Msg
 svgTimeline model =
     Svg.svg [ Attr.width "100%", Attr.height "100%" ]
-        ([ svgLine, svgTicks ]
-            ++ (model.sessions
-                    |> List.filter
-                        (\session -> session.end |> Maybe.map (isAfter (originTime model.currentTime)) |> Maybe.withDefault True)
-                    |> List.map (svgSegment model.currentTime)
-               )
+        ([ svgLine, svgTicks ] ++ List.map (svgSession model) (visibleSessions model))
+
+
+countOverlaps : Model -> Session -> Int
+countOverlaps model session =
+    visibleSessions model
+        |> List.filter
+            (\s ->
+                s.end
+                    |> Maybe.withDefault model.currentTime
+                    |> isAfter (session.end |> Maybe.withDefault model.currentTime)
+            )
+        |> List.filter (\s -> session.start |> isAfter s.start)
+        |> List.length
+        |> (\n -> n - 1)
+
+
+visibleSessions : Model -> List Session
+visibleSessions model =
+    List.filter
+        (\session ->
+            session.end
+                |> Maybe.map (isAfter (originTime model.currentTime))
+                |> Maybe.withDefault True
         )
+        model.sessions
 
 
 svgTicks : Svg.Svg Msg
@@ -53,20 +72,20 @@ svgLine =
     Svg.rect [ Attr.x "0%", Attr.width "100%", Attr.y "50%", Attr.height "1px", Attr.fill "#f0f0f0" ] []
 
 
-svgSegment : Time.Posix -> Session -> Svg.Svg Msg
-svgSegment currentTime session =
+svgSession : Model -> Session -> Svg.Svg Msg
+svgSession model session =
     let
         end =
-            Maybe.withDefault currentTime session.end
+            Maybe.withDefault model.currentTime session.end
 
         sessionSegment =
-            segment currentTime { start = session.start, end = end }
+            segment model.currentTime { start = session.start, end = end }
 
         active =
             session.end |> Maybe.map (\x -> False) |> Maybe.withDefault True
     in
     Svg.rect
-        [ Attr.y "40%"
+        [ Attr.y (yFromOverlaps (countOverlaps model session))
         , Attr.x sessionSegment.x
         , Attr.width sessionSegment.width
         , Attr.height "20%"
@@ -80,6 +99,28 @@ svgSegment currentTime session =
             )
         ]
         []
+
+
+yFromOverlaps : Int -> String
+yFromOverlaps n =
+    case n of
+        0 ->
+            "40%"
+
+        1 ->
+            "62%"
+
+        2 ->
+            "18%"
+
+        3 ->
+            "84%"
+
+        4 ->
+            "-4%"
+
+        _ ->
+            "-28%"
 
 
 segment : Time.Posix -> { start : Time.Posix, end : Time.Posix } -> { x : String, width : String }
