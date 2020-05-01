@@ -5,31 +5,25 @@ defmodule Timespectre.Plug do
   plug :match
   plug Plug.Static, at: "/", from: "../dist/"
   plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
-  # Apparently, passing in builder_opts() here lets us set the options in the
-  # init function.
-  plug :dispatch, builder_opts()
+  plug :dispatch
 
   def init(_opts) do
-    Sqlitex.with_db("test.db", fn db ->
-      # These queries may fail. However, if they do, it probably means that we
-      # already intiailized the database, so we just ignore the errors.
-      Sqlitex.query db, """
-        CREATE TABLE sessions (
-          id TEXT PRIMARY KEY,
-          start INTEGER NOT NULL,
-          end INTEGER,
-          notes TEXT NOT NULL DEFAULT '',
-          deleted INTEGER DEFAULT 0
-        )
-        """
-      Sqlitex.query db, """
-        CREATE TABLE session_tags (
-          session_id TEXT REFERENCES sessions(id),
-          tag TEXT NOT NULL,
-          PRIMARY KEY (session_id, tag)
-        )
-        """
-    end)
+    query! """
+      CREATE TABLE IF NOT EXISTS sessions (
+        id TEXT PRIMARY KEY,
+        start INTEGER NOT NULL,
+        end INTEGER,
+        notes TEXT NOT NULL DEFAULT '',
+        deleted INTEGER DEFAULT 0
+      )
+      """
+    query! """
+      CREATE TABLE IF NOT EXISTS session_tags (
+        session_id TEXT REFERENCES sessions(id),
+        tag TEXT NOT NULL,
+        PRIMARY KEY (session_id, tag)
+      )
+      """
     nil
   end
 

@@ -8,21 +8,25 @@ defmodule Timespectre.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
-    port = case Integer.parse(System.get_env("TIMESPECTRE_PORT")) do
-      {port, _} -> port
-      :error -> 80
-    end
+    {port, _} = Integer.parse(System.get_env("TIMESPECTRE_PORT") || "80")
 
-    children = [
-      worker(Sqlitex.Server, ["test.db", [name: Timespectre.DB]]),
-      Plug.Cowboy.child_spec(scheme: :http, plug: Timespectre.Plug, port: port)
-    ]
+    db_path = System.get_env("TIMESPECTRE_DATABASE_PATH") || "/var/lib/timespectre/data.db"
+
+    db_dir = Path.dirname(db_path)
+    if !File.dir?(db_dir) do
+      File.mkdir!(db_dir)
+    end
 
     IO.puts("Listening on http://localhost:#{port}/index.html")
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Timespectre.Supervisor]
-    Supervisor.start_link(children, opts)
+    # [TODO] I'm not very familiar with Elixir, but I don't this this should
+    # just be sitting here. Don't we want this inside a supervisor or something?
+    Sqlitex.Server.start_link(db_path, name: Timespectre.DB)
+
+    children = [
+      {Plug.Cowboy, scheme: :http, plug: Timespectre.Plug, port: port}
+    ]
+
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
