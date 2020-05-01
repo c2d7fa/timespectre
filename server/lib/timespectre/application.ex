@@ -8,12 +8,17 @@ defmodule Timespectre.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
+    port = case Integer.parse(System.get_env("TIMESPECTRE_PORT")) do
+      {port, _} -> port
+      :error -> 80
+    end
+
     children = [
       worker(Sqlitex.Server, ["test.db", [name: Timespectre.DB]]),
-      Plug.Cowboy.child_spec(scheme: :http, plug: Timespectre.Plug, port: 8080)
+      Plug.Cowboy.child_spec(scheme: :http, plug: Timespectre.Plug, port: port)
     ]
 
-    IO.puts("Listening on http://localhost:8080/index.html")
+    IO.puts("Listening on http://localhost:#{port}/index.html")
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
