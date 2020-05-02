@@ -1,15 +1,19 @@
 defmodule Timespectre.Database do
-  def start_link(path, opts \\ []) do
-    result = Sqlitex.Server.start_link(path, opts)
-    case result do
-      {:ok, pid} -> initialize_tables(pid)
-      _ -> nil
-    end
+  def child_spec(args) do
+    %{
+      id: Timespectre.Database,
+      start: {Timespectre.Database, :start_link, args}
+    }
+  end
+
+  def start_link(path) do
+    result = Sqlitex.Server.start_link(path, name: __MODULE__)
+    initialize_tables()
     result
   end
 
-  defp initialize_tables(db) do
-    query! db, """
+  defp initialize_tables() do
+    query! """
       CREATE TABLE IF NOT EXISTS sessions (
         id TEXT PRIMARY KEY,
         start INTEGER NOT NULL,
@@ -18,7 +22,7 @@ defmodule Timespectre.Database do
         deleted INTEGER DEFAULT 0
       )
       """
-    query! db, """
+    query! """
       CREATE TABLE IF NOT EXISTS session_tags (
         session_id TEXT REFERENCES sessions(id),
         tag TEXT NOT NULL,
@@ -27,8 +31,8 @@ defmodule Timespectre.Database do
       """
   end
 
-  def query!(db, sql, opts \\ []) do
-    {:ok, result} = Sqlitex.Server.query db, sql, opts
+  def query!(sql, opts \\ []) do
+    {:ok, result} = Sqlitex.Server.query __MODULE__, sql, opts
     result
   end
 end

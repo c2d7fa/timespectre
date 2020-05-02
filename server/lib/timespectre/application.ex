@@ -19,12 +19,8 @@ defmodule Timespectre.Application do
 
     IO.puts("Listening on http://localhost:#{port}/index.html")
 
-    # [TODO] I'm not very familiar with Elixir, but I don't this this should
-    # just be sitting here. Don't we want this inside a supervisor or something?
-    # Also, I'm not sure if I'm using 'start_link' ideomatically here.
-    Timespectre.Database.start_link(db_path, name: Timespectre.Database)
-
     children = [
+      {Timespectre.Database, [db_path]},
       {Plug.Cowboy, scheme: :http, plug: Timespectre.Plug, port: port}
     ]
 
