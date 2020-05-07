@@ -1,7 +1,6 @@
 module Main exposing (main)
 
 import Browser
-import Dict
 import Random
 import Task
 import Time
@@ -23,11 +22,12 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init () =
-    ( { sessions = []
-      , timeZone = Time.utc
-      , currentTime = Time.millisToPosix 0
-      , editingTag = Nothing
-      }
+    ( Model
+        { sessions = []
+        , timeZone = Time.utc
+        , currentTime = Time.millisToPosix 0
+        , editingTag = Nothing
+        }
     , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestState ]
     )
 
@@ -39,59 +39,64 @@ subscriptions model =
 
 update : Msg -> Model -> ( Model, Cmd.Cmd Msg )
 update msg model =
-    case msg of
-        StartSession ->
-            ( model, Random.generate SessionStarted idGenerator )
+    case model of
+        Model value ->
+            case msg of
+                StartSession ->
+                    ( model, Random.generate SessionStarted idGenerator )
 
-        SessionStarted id ->
-            ( { model | sessions = addSession id model.currentTime model.sessions }, API.putSession { id = id, start = model.currentTime, end = Nothing, notes = "", tags = [] } )
+                SessionStarted id ->
+                    ( Model { value | sessions = addSession id value.currentTime value.sessions }, API.putSession { id = id, start = value.currentTime, end = Nothing, notes = "", tags = [] } )
 
-        SetTimeZone timeZone ->
-            ( { model | timeZone = timeZone }, Cmd.none )
+                SetTimeZone timeZone ->
+                    ( Model { value | timeZone = timeZone }, Cmd.none )
 
-        SetTime time ->
-            ( { model | currentTime = time }, Cmd.none )
+                SetTime time ->
+                    ( Model { value | currentTime = time }, Cmd.none )
 
-        DiscardResponse _ ->
+                DiscardResponse _ ->
+                    ( model, Cmd.none )
+
+                FetchedSessions (Err _) ->
+                    ( FatalError "An unknown error occurred while loading state from the server. This may be due to a problem with either the server or this client. Try reloading.", Cmd.none )
+
+                FetchedSessions (Ok sessions) ->
+                    ( Model { value | sessions = sessions }, Cmd.none )
+
+                DeleteSession session ->
+                    ( Model { value | sessions = List.filter (\s -> s.id /= session.id) value.sessions }, API.deleteSession session )
+
+                SetNotes session notes ->
+                    ( Model { value | sessions = setNotes session notes value.sessions }, API.putNotes session notes )
+
+                EndSession session ->
+                    ( Model { value | sessions = endSession session value.currentTime value.sessions }, API.putEnd session value.currentTime )
+
+                EditTag session index ->
+                    ( Model { value | editingTag = Just { session = session, index = index, buffer = nthTag session index } }, Cmd.none )
+
+                AddTag session ->
+                    let
+                        ( sessions, newSession, index ) =
+                            addTag value.sessions session "tag"
+                    in
+                    update (EditTag newSession index) (Model { value | sessions = sessions })
+
+                SetEditingTagBuffer buffer ->
+                    case value.editingTag of
+                        Just inner ->
+                            ( Model { value | editingTag = Just { inner | buffer = buffer } }, Cmd.none )
+
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                SubmitTag ->
+                    case value.editingTag of
+                        Just inner ->
+                            ( Model { value | sessions = setNthTagOfSession value.sessions inner.session inner.index inner.buffer, editingTag = Nothing }, API.setTag inner.session inner.index inner.buffer )
+
+                        Nothing ->
+                            ( model, Cmd.none )
+
+        FatalError _ ->
             ( model, Cmd.none )
-
-        FetchedSessions (Err _) ->
-            Debug.log "Got error while fetching state" ( model, Cmd.none )
-
-        FetchedSessions (Ok sessions) ->
-            ( { model | sessions = sessions }, Cmd.none )
-
-        DeleteSession session ->
-            ( { model | sessions = List.filter (\s -> s.id /= session.id) model.sessions }, API.deleteSession session )
-
-        SetNotes session notes ->
-            ( { model | sessions = setNotes session notes model.sessions }, API.putNotes session notes )
-
-        EndSession session ->
-            ( { model | sessions = endSession session model.currentTime model.sessions }, API.putEnd session model.currentTime )
-
-        EditTag session index ->
-            ( { model | editingTag = Just { session = session, index = index, buffer = nthTag session index } }, Cmd.none )
-
-        AddTag session ->
-            let
-                ( sessions, newSession, index ) =
-                    addTag model.sessions session "tag"
-            in
-            update (EditTag newSession index) { model | sessions = sessions }
-
-        SetEditingTagBuffer buffer ->
-            case model.editingTag of
-                Just inner ->
-                    ( { model | editingTag = Just { inner | buffer = buffer } }, Cmd.none )
-
-                Nothing ->
-                    ( model, Cmd.none )
-
-        SubmitTag ->
-            case model.editingTag of
-                Just inner ->
-                    ( { model | sessions = setNthTagOfSession model.sessions inner.session inner.index inner.buffer, editingTag = Nothing }, API.setTag inner.session inner.index inner.buffer )
-
-                Nothing ->
-                    ( model, Cmd.none )

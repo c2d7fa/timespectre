@@ -1,16 +1,21 @@
-module Timespectre.Model exposing (EditingTag, Model, Msg(..))
+module Timespectre.Model exposing (EditingTag, Model(..), ModelValue, Msg(..))
 
 import Http
 import Time
 import Timespectre.Data exposing (Session)
 
 
-type alias Model =
+type alias ModelValue =
     { sessions : List Session
     , timeZone : Time.Zone
     , currentTime : Time.Posix
     , editingTag : Maybe EditingTag
     }
+
+
+type Model
+    = Model ModelValue
+    | FatalError String
 
 
 type alias EditingTag =

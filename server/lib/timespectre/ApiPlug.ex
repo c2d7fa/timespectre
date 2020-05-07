@@ -3,10 +3,10 @@ defmodule Timespectre.ApiPlug do
 
   use Plug.Router
 
+  plug Timespectre.AuthenticationPlug
   plug :match
   plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
   plug :dispatch
-
 
   put "/sessions/:id" do
     start_time = conn.body_params["start"]

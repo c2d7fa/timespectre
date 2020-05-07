@@ -12,6 +12,24 @@ import Timespectre.View.Timeline exposing (viewTimeline)
 
 view : Model -> Html.Html Msg
 view model =
+    case model of
+        Model value ->
+            viewValue value
+
+        FatalError error ->
+            viewError error
+
+
+viewError : String -> Html.Html Msg
+viewError error =
+    Html.div [ Attr.class "fatal-error" ]
+        [ Html.h1 [] [ Html.text "Fatal error" ]
+        , Html.p [] [ Html.text error ]
+        ]
+
+
+viewValue : ModelValue -> Html.Html Msg
+viewValue model =
     Html.div [ Attr.class "main-container" ]
         [ viewTimeline model
         , viewSidebar model
@@ -19,7 +37,7 @@ view model =
         ]
 
 
-viewSidebar : Model -> Html.Html Msg
+viewSidebar : ModelValue -> Html.Html Msg
 viewSidebar model =
     Html.ul [ Attr.class "sidebar" ]
         [ Html.li [] [ Html.button [ Ev.onClick StartSession ] [ Html.text "Start Session" ] ]
@@ -27,12 +45,12 @@ viewSidebar model =
         ]
 
 
-viewSessions : Model -> Html.Html Msg
+viewSessions : ModelValue -> Html.Html Msg
 viewSessions model =
     Html.ul [ Attr.class "sessions" ] (List.map (viewSession model) model.sessions)
 
 
-viewSession : Model -> Session -> Html.Html Msg
+viewSession : ModelValue -> Session -> Html.Html Msg
 viewSession model session =
     Html.li
         [ Attr.classList [ ( "outer-session", True ), ( "active", isActive session ) ] ]

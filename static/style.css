@@ -283,3 +283,21 @@ button.tag:hover {
 }
 
 /* #endregion */
+
+/* #region Fatal error */
+
+.fatal-error {
+  margin: 4rem auto;
+  background-color: hsl(0, 60%, 60%);
+  color: white;
+  padding: 2rem 4rem;
+  max-width: 40rem;
+  border-radius: 6px;
+  font-size: 1.25em;
+}
+
+.fatal-error h1 {
+  font-size: 1.5em;
+}
+
+/* #endregion */

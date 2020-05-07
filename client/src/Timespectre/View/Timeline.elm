@@ -6,22 +6,22 @@ import Svg
 import Svg.Attributes as Attr
 import Time
 import Timespectre.Data exposing (..)
-import Timespectre.Model exposing (Model, Msg(..))
+import Timespectre.Model exposing (ModelValue, Msg(..))
 import Timespectre.Util exposing (divisibleBy, isAfter, rangeBy)
 
 
-viewTimeline : Model -> Html.Html Msg
+viewTimeline : ModelValue -> Html.Html Msg
 viewTimeline model =
     Html.div [ Html.Attributes.class "timeline" ] [ svgTimeline model ]
 
 
-svgTimeline : Model -> Html.Html Msg
+svgTimeline : ModelValue -> Html.Html Msg
 svgTimeline model =
     Svg.svg [ Attr.width "100%", Attr.height "100%" ]
         ([ svgLine, svgTicks ] ++ List.map (svgSession model) (visibleSessions model))
 
 
-countOverlaps : Model -> Session -> Int
+countOverlaps : ModelValue -> Session -> Int
 countOverlaps model session =
     visibleSessions model
         |> List.filter
@@ -36,7 +36,7 @@ countOverlaps model session =
         |> (\n -> n - 1)
 
 
-visibleSessions : Model -> List Session
+visibleSessions : ModelValue -> List Session
 visibleSessions model =
     List.filter
         (\session ->
@@ -73,7 +73,7 @@ svgLine =
     Svg.rect [ Attr.x "0%", Attr.width "100%", Attr.y "50%", Attr.height "1px", Attr.fill "#f0f0f0" ] []
 
 
-svgSession : Model -> Session -> Svg.Svg Msg
+svgSession : ModelValue -> Session -> Svg.Svg Msg
 svgSession model session =
     let
         end =
