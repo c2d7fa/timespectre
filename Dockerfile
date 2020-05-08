@@ -19,7 +19,7 @@ COPY run.sh run.sh
 COPY --from=client /work/dist dist
 
 COPY server server
-RUN cd server && mix local.hex --force && mix deps.get && cd .. 
+RUN cd server && mix local.hex --force && mix local.rebar --force && mix deps.get && cd .. 
 
 EXPOSE 80
 ENTRYPOINT ./run.sh
