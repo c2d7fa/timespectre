@@ -28,6 +28,7 @@ init () =
         , currentTime = Time.millisToPosix 0
         , editingTag = Nothing
         , mode = Sessions
+        , tagStats = Nothing
         }
     , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestState ]
     )
@@ -63,6 +64,12 @@ update msg model =
 
                 FetchedSessions (Ok sessions) ->
                     ( Model { value | sessions = sessions }, Cmd.none )
+
+                FetchedTagStats (Err _) ->
+                    ( FatalError "An unknown error occurred while loading tag statistics from the server. This may be due to a problem with either the server or this client. Try reloading.", Cmd.none )
+
+                FetchedTagStats (Ok stats) ->
+                    ( Model { value | tagStats = Just stats }, Cmd.none )
 
                 DeleteSession session ->
                     ( Model { value | sessions = List.filter (\s -> s.id /= session.id) value.sessions }, API.deleteSession session )
@@ -100,10 +107,10 @@ update msg model =
                             ( model, Cmd.none )
 
                 ViewSessions ->
-                    ( Model { value | mode = Sessions }, Cmd.none )
+                    ( Model { value | mode = Sessions }, API.requestState )
 
                 ViewTags ->
-                    ( Model { value | mode = Tags }, Cmd.none )
+                    ( Model { value | mode = Tags }, API.requestTagStats )
 
         FatalError _ ->
             ( model, Cmd.none )

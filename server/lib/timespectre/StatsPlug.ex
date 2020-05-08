@@ -16,7 +16,7 @@ defmodule Timespectre.StatsPlug do
       GROUP BY tag
       """
 
-    map = Map.new result, fn [tag: tag, duration: duration] -> {tag, duration} end
+    map = Map.new result, fn [tag: tag, duration: duration] -> {tag, duration || 0} end
 
     send_resp(conn, 200, Jason.encode! map)
   end

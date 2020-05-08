@@ -4,14 +4,16 @@ module Timespectre.API exposing
     , putNotes
     , putSession
     , requestState
+    , requestTagStats
     , setTag
     )
 
+import Dict exposing (Dict)
 import Http
 import Json.Decode
 import Json.Encode
 import Time
-import Timespectre.Data exposing (Session, nthTag)
+import Timespectre.Data exposing (Duration, Session, nthTag)
 import Timespectre.Model exposing (Msg(..))
 
 
@@ -31,6 +33,16 @@ sessionsDecoder =
 requestState : Cmd Msg
 requestState =
     Http.get { url = "/api/sessions", expect = Http.expectJson FetchedSessions sessionsDecoder }
+
+
+tagStatsDecoder : Json.Decode.Decoder (Dict String Duration)
+tagStatsDecoder =
+    Json.Decode.dict (Json.Decode.int |> Json.Decode.map (\ms -> { ms = ms }))
+
+
+requestTagStats : Cmd Msg
+requestTagStats =
+    Http.get { url = "/api/stats/tags", expect = Http.expectJson FetchedTagStats tagStatsDecoder }
 
 
 putSession : Session -> Cmd Msg

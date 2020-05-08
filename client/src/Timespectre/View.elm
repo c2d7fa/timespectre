@@ -7,6 +7,7 @@ import Html.Events as Ev
 import Time
 import Timespectre.Data exposing (..)
 import Timespectre.Model exposing (..)
+import Timespectre.View.Tags exposing (viewTags)
 import Timespectre.View.Timeline exposing (viewTimeline)
 
 
@@ -51,11 +52,6 @@ viewSidebar model =
         , Html.li [] [ Html.button [ Ev.onClick ViewSessions ] [ Html.text "Sessions >" ] ]
         , Html.li [] [ Html.button [ Ev.onClick ViewTags ] [ Html.text "Tags >" ] ]
         ]
-
-
-viewTags : ModelValue -> Html.Html Msg
-viewTags _ =
-    viewError "Not implemented."
 
 
 viewSessions : ModelValue -> Html.Html Msg
