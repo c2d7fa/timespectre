@@ -1,8 +1,13 @@
-module Timespectre.Model exposing (EditingTag, Model(..), ModelValue, Msg(..))
+module Timespectre.Model exposing (EditingTag, Mode(..), Model(..), ModelValue, Msg(..))
 
 import Http
 import Time
 import Timespectre.Data exposing (Session)
+
+
+type Mode
+    = Sessions
+    | Tags
 
 
 type alias ModelValue =
@@ -10,6 +15,7 @@ type alias ModelValue =
     , timeZone : Time.Zone
     , currentTime : Time.Posix
     , editingTag : Maybe EditingTag
+    , mode : Mode
     }
 
 
@@ -39,3 +45,5 @@ type Msg
     | AddTag Session
     | SetEditingTagBuffer String
     | SubmitTag
+    | ViewSessions
+    | ViewTags

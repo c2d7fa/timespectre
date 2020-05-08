@@ -33,7 +33,14 @@ viewValue model =
     Html.div [ Attr.class "main-container" ]
         [ viewTimeline model
         , viewSidebar model
-        , Html.div [ Attr.class "main-view" ] [ viewSessions model ]
+        , Html.div [ Attr.class "main-view" ]
+            [ case model.mode of
+                Sessions ->
+                    viewSessions model
+
+                Tags ->
+                    viewTags model
+            ]
         ]
 
 
@@ -41,8 +48,14 @@ viewSidebar : ModelValue -> Html.Html Msg
 viewSidebar model =
     Html.ul [ Attr.class "sidebar" ]
         [ Html.li [] [ Html.button [ Ev.onClick StartSession ] [ Html.text "Start Session" ] ]
-        , Html.li [] [ Html.text "Sessions" ]
+        , Html.li [] [ Html.button [ Ev.onClick ViewSessions ] [ Html.text "Sessions >" ] ]
+        , Html.li [] [ Html.button [ Ev.onClick ViewTags ] [ Html.text "Tags >" ] ]
         ]
+
+
+viewTags : ModelValue -> Html.Html Msg
+viewTags _ =
+    viewError "Not implemented."
 
 
 viewSessions : ModelValue -> Html.Html Msg

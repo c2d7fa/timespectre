@@ -104,6 +104,20 @@ time {
   border-radius: 6px 0 0 0;
 }
 
+.sidebar {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  padding: 1rem 2rem;
+
+  text-align: right;
+}
+
+.sidebar li + li {
+  margin-top: 1rem;
+}
+
 /* #endregion */
 
 /* #region Sessions */

@@ -27,6 +27,7 @@ init () =
         , timeZone = Time.utc
         , currentTime = Time.millisToPosix 0
         , editingTag = Nothing
+        , mode = Sessions
         }
     , Cmd.batch [ Task.perform SetTimeZone Time.here, API.requestState ]
     )
@@ -97,6 +98,12 @@ update msg model =
 
                         Nothing ->
                             ( model, Cmd.none )
+
+                ViewSessions ->
+                    ( Model { value | mode = Sessions }, Cmd.none )
+
+                ViewTags ->
+                    ( Model { value | mode = Tags }, Cmd.none )
 
         FatalError _ ->
             ( model, Cmd.none )
