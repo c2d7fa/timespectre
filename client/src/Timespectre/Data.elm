@@ -4,7 +4,6 @@ module Timespectre.Data exposing
     , addSession
     , addTag
     , endSession
-    , formatDuration
     , idGenerator
     , isActive
     , nthTag
@@ -79,35 +78,6 @@ idGenerator =
 until : Time.Posix -> Time.Posix -> Duration
 until t1 t2 =
     { ms = Time.posixToMillis t2 - Time.posixToMillis t1 }
-
-
-durationMixed : Duration -> { hours : Int, minutes : Int, seconds : Int, ms : Int }
-durationMixed { ms } =
-    { hours = ms // (1000 * 60 * 60)
-    , minutes = modBy 60 (ms // (1000 * 60))
-    , seconds = modBy 60 (ms // 1000)
-    , ms = modBy 1000 ms
-    }
-
-
-formatDuration : Duration -> String
-formatDuration duration =
-    let
-        { hours, minutes, seconds, ms } =
-            durationMixed duration
-    in
-    case ( hours, minutes, seconds ) of
-        ( 0, 0, 0 ) ->
-            String.fromInt ms ++ "ms"
-
-        ( 0, 0, _ ) ->
-            String.fromInt seconds ++ "s"
-
-        ( 0, _, _ ) ->
-            String.fromInt minutes ++ "m" ++ String.fromInt seconds ++ "s"
-
-        ( _, _, _ ) ->
-            String.fromInt hours ++ "h" ++ String.fromInt minutes ++ "m"
 
 
 nthTag : Session -> Int -> String

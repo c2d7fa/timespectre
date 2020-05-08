@@ -64,6 +64,12 @@ time {
   font-weight: normal;
 }
 
+:not(button).tag {
+  cursor: default;
+  padding: 0.2em 0.5em;
+  border-radius: 3px;
+}
+
 /* #endregion */
 
 /* #region Navigation */
@@ -312,6 +318,22 @@ button.tag:hover {
 
 .fatal-error h1 {
   font-size: 1.5em;
+}
+
+/* #endregion */
+
+/* #region Tag stats */
+
+table.tag-stats {
+  margin-top: 1rem;
+  border-collapse: collapse;
+}
+
+table.tag-stats td {
+  padding: 0.75rem 0;
+  padding-right: 2rem;
+
+  border-bottom: 1px solid #e0e0e0;
 }
 
 /* #endregion */
