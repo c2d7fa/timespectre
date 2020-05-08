@@ -8,6 +8,8 @@ defmodule Timespectre.ApiPlug do
   plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
   plug :dispatch
 
+  forward "/stats", to: Timespectre.StatsPlug
+
   put "/sessions/:id" do
     start_time = conn.body_params["start"]
     end_time = conn.body_params["end"]
