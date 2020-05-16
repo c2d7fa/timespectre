@@ -7,14 +7,24 @@ defmodule Timespectre.StatsPlug do
   plug :dispatch
 
   get "/tags" do
+    since = case conn.query_params["since"] do
+      nil -> 0
+      since_string ->
+        case Integer.parse(since_string) do
+          {since_int, ""} -> since_int
+          _ -> 0
+        end
+    end
+
     result = query! """
       SELECT tag, SUM(end - start) as duration
       FROM session_tags
       JOIN sessions ON id = session_id
       WHERE
         NOT deleted
+        AND end >= ?1
       GROUP BY tag
-      """
+      """, bind: [since]
 
     map = Map.new result, fn [tag: tag, duration: duration] -> {tag, duration || 0} end
 
