@@ -324,8 +324,12 @@ button.tag:hover {
 
 /* #region Tag stats */
 
-table.tag-stats {
+.tag-stats-container {
   margin-top: 1rem;
+}
+
+table.tag-stats {
+  margin-top: 0.5rem;
   border-collapse: collapse;
 }
 

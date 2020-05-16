@@ -22,7 +22,7 @@ defmodule Timespectre.StatsPlug do
       JOIN sessions ON id = session_id
       WHERE
         NOT deleted
-        AND end >= ?1
+        AND start >= ?1
       GROUP BY tag
       """, bind: [since]
 

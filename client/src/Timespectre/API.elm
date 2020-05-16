@@ -4,7 +4,7 @@ module Timespectre.API exposing
     , putNotes
     , putSession
     , requestState
-    , requestTagStats
+    , requestTagStatsSince
     , setTag
     )
 
@@ -40,9 +40,9 @@ tagStatsDecoder =
     Json.Decode.dict (Json.Decode.int |> Json.Decode.map (\ms -> { ms = ms }))
 
 
-requestTagStats : Cmd Msg
-requestTagStats =
-    Http.get { url = "/api/stats/tags", expect = Http.expectJson FetchedTagStats tagStatsDecoder }
+requestTagStatsSince : Time.Posix -> Cmd Msg
+requestTagStatsSince since =
+    Http.get { url = "/api/stats/tags?since=" ++ String.fromInt (Time.posixToMillis since), expect = Http.expectJson FetchedTagStats tagStatsDecoder }
 
 
 putSession : Session -> Cmd Msg

@@ -3,8 +3,9 @@ module Timespectre.View.Tags exposing (viewTags)
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes as Attr
+import Html.Events as Ev
 import Timespectre.Data exposing (Duration)
-import Timespectre.Model exposing (ModelValue, Msg)
+import Timespectre.Model exposing (ModelValue, Msg(..))
 import Timespectre.View.General exposing (viewDuration)
 
 
@@ -15,7 +16,28 @@ viewTags model =
             Html.text "Loading..."
 
         Just tagStats ->
-            viewTagStats tagStats
+            Html.div [ Attr.class "tag-stats-container" ]
+                [ viewSinceControl
+                , viewTagStats tagStats
+                ]
+
+
+viewSinceControl : Html Msg
+viewSinceControl =
+    Html.select
+        [ Ev.onInput
+            (\option ->
+                case option of
+                    "today" ->
+                        ViewTagsToday
+
+                    _ ->
+                        ViewTags
+            )
+        ]
+        [ Html.option [ Attr.value "" ] [ Html.text "All Time" ]
+        , Html.option [ Attr.value "today" ] [ Html.text "Today" ]
+        ]
 
 
 viewTagStats : Dict String Duration -> Html Msg

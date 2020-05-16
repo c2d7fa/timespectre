@@ -7,6 +7,7 @@ import Time
 import Timespectre.API as API
 import Timespectre.Data exposing (..)
 import Timespectre.Model exposing (..)
+import Timespectre.Util as Util
 import Timespectre.View exposing (view)
 
 
@@ -110,7 +111,10 @@ update msg model =
                     ( Model { value | mode = Sessions }, API.requestState )
 
                 ViewTags ->
-                    ( Model { value | mode = Tags }, API.requestTagStats )
+                    ( Model { value | mode = Tags }, API.requestTagStatsSince (Time.millisToPosix 0) )
+
+                ViewTagsToday ->
+                    ( Model { value | mode = Tags }, API.requestTagStatsSince (Util.lastMidnight value.currentTime value.timeZone) )
 
         FatalError _ ->
             ( model, Cmd.none )

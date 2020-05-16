@@ -50,3 +50,4 @@ type Msg
     | SubmitTag
     | ViewSessions
     | ViewTags
+    | ViewTagsToday
