@@ -37,7 +37,7 @@ defmodule Timespectre.ApiPlug do
   get "/sessions" do
     # [TODO] Don't query unnecessary session tags.
 
-    sessions = query! ~s{SELECT "id", "start", "end", "notes" FROM "sessions" WHERE "deleted" = 0 ORDER BY "end" IS NOT NULL, "end" DESC, "start" DESC}, into: %{}
+    sessions = query! ~s{SELECT "id", "start", "end", "notes" FROM "sessions" WHERE "deleted" = 0 ORDER BY "end" IS NOT NULL, "end" DESC, "start" DESC LIMIT 50}, into: %{}
     session_tags = query! ~s{SELECT "session_id", "tag" FROM "session_tags"}, into: %{}
 
     sessions_with_tags = Enum.map(sessions, fn session ->
