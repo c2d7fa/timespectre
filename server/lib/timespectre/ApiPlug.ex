@@ -1,5 +1,5 @@
 defmodule Timespectre.ApiPlug do
-  import Timespectre.Database, only: [{:query!, 2}]
+  import Timespectre.Database, only: [{:query!, 1}, {:query!, 2}]
 
   use Plug.Router
 
@@ -35,19 +35,25 @@ defmodule Timespectre.ApiPlug do
   end
 
   get "/sessions" do
-    # [TODO] Don't query unnecessary session tags.
+    sessions = query! """
+      SELECT
+        id, start, end, notes,
+        IFNULL(GROUP_CONCAT(tag), '') AS tags
+      FROM sessions
+      LEFT JOIN session_tags ON id = session_id
+      WHERE NOT deleted
+      GROUP BY id
+      ORDER BY end IS NOT NULL, end DESC, start DESC
+      LIMIT 50
+      """
 
-    sessions = query! ~s{SELECT "id", "start", "end", "notes" FROM "sessions" WHERE "deleted" = 0 ORDER BY "end" IS NOT NULL, "end" DESC, "start" DESC LIMIT 50}, into: %{}
-    session_tags = query! ~s{SELECT "session_id", "tag" FROM "session_tags"}, into: %{}
-
-    sessions_with_tags = Enum.map(sessions, fn session ->
-      tags = session_tags
-        |> Enum.filter(fn tag -> tag.session_id == session.id end)
-        |> Enum.map(fn tag -> tag.tag end)
-      Map.put_new(session, :tags, tags)
+    result = Enum.map(sessions, fn session ->
+      session
+        |> Map.new
+        |> Map.put(:tags, String.split(Keyword.get(session, :tags), ","))
     end)
 
-    send_resp(conn, 200, Jason.encode! sessions_with_tags)
+    send_resp(conn, 200, Jason.encode! result)
   end
 
   # Rename or create tag
