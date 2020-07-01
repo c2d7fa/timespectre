@@ -123,7 +123,7 @@ setTag session index newTag =
             , tracker = Nothing
             }
 
-    else if index >= List.length session.tags - 1 then
+    else if index > List.length session.tags - 1 then
         Http.request
             { method = "POST"
             , headers = []
