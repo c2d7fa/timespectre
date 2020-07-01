@@ -47,10 +47,14 @@ defmodule Timespectre.ApiPlug do
       LIMIT 50
       """
 
+    split_comma_list = fn s ->
+      String.split(s, ",") |> Enum.filter(fn x -> x != "" end)
+    end
+
     result = Enum.map(sessions, fn session ->
       session
         |> Map.new
-        |> Map.put(:tags, String.split(Keyword.get(session, :tags), ","))
+        |> Map.put(:tags, split_comma_list.(Keyword.get(session, :tags)))
     end)
 
     send_resp(conn, 200, Jason.encode! result)
