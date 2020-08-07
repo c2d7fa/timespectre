@@ -3,7 +3,8 @@
 mkdir -p dist
 
 # Static
-cp -r static/* dist
+cp static/index.html dist
+sass static/style.scss dist/style.css
 
 # Elm
 cd client

@@ -29,10 +29,10 @@ button {
   transition: background-color 100ms, color 100ms, box-shadow 100ms;
 
   box-shadow: 0 0 6px transparent;
-}
 
-button:hover {
-  background-color: #00000020;
+  &:hover {
+    background-color: #00000020;
+  }
 }
 
 .ui-text {

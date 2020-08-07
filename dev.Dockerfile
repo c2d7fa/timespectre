@@ -20,6 +20,9 @@ RUN \
 RUN sudo -u user yay --noconfirm -S elm-platform-bin
 RUN sudo -u user yay --noconfirm -S elm-format elm-test
 
+RUN pacman --noconfirm -S npm
+RUN npm install -g sass
+
 RUN pacman --noconfirm -S tmux
 
 RUN alias ls='ls --color -F'

@@ -31,6 +31,9 @@ Timespectre is designed for self-hosting on a Linux machine. It requires Elixir
 and Mix as well as the Elm Platform to be installed. On Arch Linux, the relevant
 packages are `elixir` and `aur/elm-platform-bin`.
 
+You will also need to have Sass installed, and have the `sass` binary available
+in your path. You can install this from NPM with `npm install -g sass`.
+
 You first need to build the static resources and client into the `dist` folder:
 
     $ ./build.sh
