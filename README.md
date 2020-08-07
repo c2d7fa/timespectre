@@ -45,3 +45,15 @@ Before running Timespectre the first time, you need to install some dependencies
 Then start Timespectre itself:
 
     $ ./run.sh
+
+## Development
+
+While working on Timespectre, it may be useful to have a standardized development environment. The Dockerfile called `dev.Dockerfile` describes a Docker image that has everything you need for development. Build it with:
+
+    # docker build -t timespectre-dev -f dev.Dockerfile .
+
+Then, run it, and make sure the working directory is mounted in `/work`. You'll probably want to expose port 80:
+
+    # docker run -ti -v $(pwd):/work -p 127.0.0.1:8080:80 timespectre-dev
+
+From inside the Docker image, follow the instructions above (under "Without Docker") to build and run Timespectre. You will need to rerun `./build.sh` each time you change static resources, and `./run.sh` each time you cahnge the Elixir code.
