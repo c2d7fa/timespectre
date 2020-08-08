@@ -10,6 +10,7 @@ COPY static static
 RUN npm install -g sass@^1.26.10
 
 RUN mkdir -p dist
+RUN cp static/*.html dist/
 RUN sass static/style.scss dist/style.css
 
 # Build Elm client.
