@@ -89,9 +89,13 @@ time {
   grid-template:
     "timeline timeline" 40px
     "navigation main-view" 1fr
-    / 20em 1fr;
+    / 15rem 1fr;
 
   height: 100vh;
+
+  @media (max-width: 75rem) {
+    grid-template-columns: 20vw 1fr;
+  }
 }
 
 .timeline {
@@ -121,6 +125,26 @@ nav ul {
 
 nav ul li + li {
   margin-top: 1rem;
+}
+
+@media (max-width: 720px) {
+  .main-container {
+    grid-template:
+      "timeline" 40px
+      "navigation" auto
+      "main-view" 1fr;
+  }
+
+  nav ul {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+  }
+
+  nav ul li + li {
+    margin-top: 0;
+    margin-left: 1.5rem;
+  }
 }
 
 /* #endregion */
