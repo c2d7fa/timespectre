@@ -17,11 +17,10 @@ RUN \
   cd yay && \
   sudo -u user makepkg -si --noconfirm
 
-RUN sudo -u user yay --noconfirm -S elm-platform-bin
-RUN sudo -u user yay --noconfirm -S elm-format elm-test
-
 RUN pacman --noconfirm -S npm
 RUN npm install -g sass
+
+RUN npm install -g --unsafe-perm=true elm elm-format elm-test
 
 RUN pacman --noconfirm -S tmux
 

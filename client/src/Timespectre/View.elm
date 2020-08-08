@@ -55,11 +55,12 @@ viewNavigation model =
             ]
         ]
 
+
 viewModeButton : ModelValue -> Mode -> String -> Msg -> Html.Html Msg
 viewModeButton model mode label message =
     Html.button
         [ Ev.onClick message
-        , Attr.classList [("active", model.mode == mode)]
+        , Attr.classList [ ( "active", model.mode == mode ) ]
         ]
         [ Html.text label ]
 
@@ -110,6 +111,7 @@ viewTag editingTag session index =
                     , Ev.onBlur SubmitTag
                     ]
                     []
+
             else
                 viewStaticTag session index
 
