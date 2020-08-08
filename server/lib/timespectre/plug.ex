@@ -9,7 +9,11 @@ defmodule Timespectre.Plug do
   forward "/api", to: Timespectre.ApiPlug
 
   get "/" do
-    send_file(conn, 200, "../dist/index.html")
+    if Timespectre.Authentication.authenticated?(conn) do
+      send_file(conn, 200, "../dist/index.html")
+    else
+      send_file(conn, 200, "../dist/login.html")
+    end
   end
 
   match _ do

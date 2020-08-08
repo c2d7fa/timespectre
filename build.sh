@@ -3,7 +3,7 @@
 mkdir -p dist
 
 # Static
-cp static/index.html dist
+cp static/*.html dist
 sass static/style.scss dist/style.css
 
 # Elm
