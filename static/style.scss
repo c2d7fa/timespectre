@@ -106,9 +106,7 @@ nav {
   grid-area: main-view;
   overflow-y: auto;
 
-  background-color: #fefefe;
-  border-left: 1px solid $session-inactive-border-color;
-  border-top: 1px solid $session-inactive-border-color;
+  background-color: $session-inactive-border-color;
 }
 
 nav ul {
@@ -144,6 +142,10 @@ nav ul li + li {
 
   display: flex;
   justify-content: center;
+}
+
+.outer-session:not(.active) + .outer-session:not(.active) {
+  padding-top: 0;
 }
 
 .outer-session.active {
