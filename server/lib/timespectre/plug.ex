@@ -16,6 +16,13 @@ defmodule Timespectre.Plug do
     end
   end
 
+  get "/logout" do
+    conn
+      |> Timespectre.Authentication.unauthenticate
+      |> put_resp_header("location", "/")
+      |> send_resp(303, "")
+  end
+
   match _ do
     send_resp(conn, 404, "Not found")
   end

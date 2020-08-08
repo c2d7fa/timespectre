@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Navigation exposing (load)
 import Random
 import Task
 import Time
@@ -115,6 +116,9 @@ update msg model =
 
                 ViewTagsToday ->
                     ( Model { value | mode = Tags }, API.requestTagStatsSince (Util.lastMidnight value.currentTime value.timeZone) )
+
+                LogOut ->
+                    ( model, load "/logout" )
 
         FatalError _ ->
             ( model, Cmd.none )
