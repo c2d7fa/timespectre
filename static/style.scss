@@ -1,3 +1,25 @@
+/* #region Mixins and variables */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+$ui-font-family: 'Roboto', sans-serif;
+
+$button-inactive-color: hsl(0, 0, 65%);
+$button-hover-color: hsl(0, 0, 45%);
+$button-active-color: hsl(0, 0, 40%);
+$button-suggested-color: hsl(200, 50%, 50%);
+$button-suggested-hover-color: hsl(200, 80%, 35%);
+
+$session-inactive-border-color: hsl(0, 0%, 90%);
+
+$ui-text-color: hsl(0, 0, 75%);
+$timestamp-color: $ui-text-color;
+$duration-color: $button-active-color;
+
+/* #endregion */
+
+/* #region General */
+
 body {
   margin: 0;
 
@@ -7,67 +29,55 @@ body {
   background-color: #fcfcfc;
 }
 
-/* #region General */
-
 button {
   background: none;
   outline: none;
   border: none;
-  font: inherit;
-  color: inherit;
+  padding: 0;
+
+  font-family: $ui-font-family;
+  font-size: 1em;
+  color: $button-inactive-color;
+  text-transform: lowercase;
 
   cursor: pointer;
 
-  padding: 0.2em 0.5em;
-  border-radius: 3px;
-
-  background-color: #00000014;
-  color: #000000c0;
-
-  font-weight: bold;
-
-  transition: background-color 100ms, color 100ms, box-shadow 100ms;
-
-  box-shadow: 0 0 6px transparent;
-
   &:hover {
-    background-color: #00000020;
+    color: $button-hover-color;
+  }
+
+  &.active {
+    font-weight: bold;
+    color: $button-active-color;
+  }
+
+  &.suggested {
+    font-weight: bold;
+    color: $button-suggested-color;
+
+    &:hover {
+      color: $button-suggested-hover-color;
+    }
   }
 }
 
 .ui-text {
-  color: #00000060;
   cursor: default;
-  font-size: 0.9em;
   vertical-align: middle;
-}
 
-time,
-.duration {
-  cursor: default;
-  padding: 0.2em 0.5em;
-  border-radius: 3px;
+  font-family: $ui-font-family;
+  color: $ui-text-color;
 }
 
 time {
-  background-color: hsl(200, 10%, 90%);
+  @extend .ui-text;
+  color: $timestamp-color;
 }
 
 .duration {
-  background-color: hsl(200, 40%, 75%);
-  color: hsl(200, 15%, 15%);
-}
-
-.tag {
-  background-color: hsl(40, 75%, 75%);
-  color: hsl(40, 50%, 25%);
-  font-weight: normal;
-}
-
-:not(button).tag {
-  cursor: default;
-  padding: 0.2em 0.5em;
-  border-radius: 3px;
+  @extend .ui-text;
+  color: $duration-color;
+  font-weight: bold;
 }
 
 /* #endregion */
@@ -78,39 +88,30 @@ time {
   display: grid;
   grid-template:
     "timeline timeline" 40px
-    "sidebar main-view" 1fr
+    "navigation main-view" 1fr
     / 20em 1fr;
 
   height: 100vh;
-}
-
-@media (max-width: 1000px) {
-  .main-container {
-    grid-template-columns: 1fr 2fr;
-  }
 }
 
 .timeline {
   grid-area: timeline;
 }
 
-.sidebar {
-  grid-area: sidebar;
+nav {
+  grid-area: navigation;
 }
 
 .main-view {
   grid-area: main-view;
   overflow-y: auto;
 
-  padding: 0 1rem;
-
   background-color: #fefefe;
-  border-left: 1px solid #f0f0f0;
-  border-top: 1px solid #f0f0f0;
-  border-radius: 6px 0 0 0;
+  border-left: 1px solid $session-inactive-border-color;
+  border-top: 1px solid $session-inactive-border-color;
 }
 
-.sidebar {
+nav ul {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -120,7 +121,7 @@ time {
   text-align: right;
 }
 
-.sidebar li + li {
+nav ul li + li {
   margin-top: 1rem;
 }
 
@@ -131,22 +132,15 @@ time {
 .sessions {
   list-style: none;
   padding: 0;
+  margin: 0;
 
   display: flex;
   flex-direction: column;
 }
 
-.outer-session:first-child {
-  border-radius: 6px 6px 0 0;
-}
-
-.outer-session:last-child {
-  border-radius: 0 0 6px 6px;
-}
-
 .outer-session {
   padding: 12px;
-  background-color: hsl(200, 10%, 90%);
+  background-color: $session-inactive-border-color;
 
   display: flex;
   justify-content: center;
@@ -156,16 +150,10 @@ time {
   animation: active-session-background 1s infinite ease-in-out alternate;
 }
 
-.outer-session:not(.active) + .outer-session:not(.active) {
-  padding-top: 0;
-}
-
 .session {
   display: inline-block;
   background-color: hsl(200, 15%, 97%);
   padding: 1rem;
-
-  border-radius: 6px;
 
   color: #000000e0;
   width: 100%;
@@ -184,7 +172,7 @@ time {
 
 .session > * + * {
   display: block;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .session > .ui-text,
@@ -203,7 +191,6 @@ time {
   width: 100%;
 
   background-color: #00000008;
-  border-radius: 3px;
 
   padding: 0.5em;
   box-sizing: border-box;
@@ -218,36 +205,36 @@ time {
 }
 
 .end-button {
-  color: #ffffff;
-  animation: active-session-background 1s infinite ease-in-out alternate;
-}
+  font-weight: bold;
+  color: $button-suggested-color;
 
-.end-button:hover {
-  animation-play-state: paused;
+  &:hover {
+    color: $button-suggested-hover-color;
+  }
 }
 
 .delete-button:hover {
-  background-color: hsl(10, 50%, 60%);
-  color: #ffffff;
+  color: hsl(10, 50%, 60%);
 }
 
-.session .duration,
-.session .tags > * + * {
-  margin-left: 0.5em;
+.session .duration {
+  margin-right: 0.5rem;
 }
 
-.add-tag {
-  color: hsl(40, 0%, 60%);
+.session .tags > * + *  {
+  margin-left: 0.5rem;
 }
 
-button.tag:hover {
-  background-color: hsl(40, 75%, 80%);
-  color: hsl(40, 20%, 40%);
-}
+.tag {
+  background-color: hsl(40, 75%, 75%);
+  color: hsl(40, 50%, 25%);
 
-.add-tag:hover {
-  background-color: hsl(40, 75%, 80%);
-  color: hsl(40, 50%, 60%);
+  padding: 0 0.3rem;
+  
+  &:hover {
+    background-color: hsl(40, 75%, 80%);
+    color: hsl(40, 20%, 40%);
+  }
 }
 
 .editing-tag {
@@ -256,8 +243,7 @@ button.tag:hover {
   background: none;
   font: inherit;
 
-  padding: 0.2em 0.5em;
-  border-radius: 3px;
+  padding: 0 0.3rem;
 
   width: 8em;
 

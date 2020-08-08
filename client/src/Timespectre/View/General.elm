@@ -48,17 +48,15 @@ viewTime zone time =
 
 formatTime : Time.Zone -> Time.Posix -> String
 formatTime zone time =
-    (time |> Time.toYear zone |> String.fromInt)
-        ++ "-"
+    (time |> Time.toDay zone |> String.fromInt)
+        ++ " "
         ++ (time |> Time.toMonth zone |> formatMonth)
-        ++ "-"
-        ++ (time |> Time.toDay zone |> String.fromInt)
+        ++ ", "
+        ++ (time |> Time.toYear zone |> String.fromInt)
         ++ " "
         ++ (time |> Time.toHour zone |> String.fromInt |> String.padLeft 2 '0')
         ++ ":"
         ++ (time |> Time.toMinute zone |> String.fromInt |> String.padLeft 2 '0')
-        ++ ":"
-        ++ (time |> Time.toSecond zone |> String.fromInt |> String.padLeft 2 '0')
 
 
 formatMonth : Time.Month -> String

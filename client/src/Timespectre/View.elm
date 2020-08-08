@@ -33,7 +33,7 @@ viewValue : ModelValue -> Html.Html Msg
 viewValue model =
     Html.div [ Attr.class "main-container" ]
         [ viewTimeline model
-        , viewSidebar model
+        , viewNavigation model
         , Html.div [ Attr.class "main-view" ]
             [ case model.mode of
                 Sessions ->
@@ -45,13 +45,23 @@ viewValue model =
         ]
 
 
-viewSidebar : ModelValue -> Html.Html Msg
-viewSidebar model =
-    Html.ul [ Attr.class "sidebar" ]
-        [ Html.li [] [ Html.button [ Ev.onClick StartSession ] [ Html.text "Start Session" ] ]
-        , Html.li [] [ Html.button [ Ev.onClick ViewSessions ] [ Html.text "Sessions >" ] ]
-        , Html.li [] [ Html.button [ Ev.onClick ViewTags ] [ Html.text "Tags >" ] ]
+viewNavigation : ModelValue -> Html.Html Msg
+viewNavigation model =
+    Html.nav []
+        [ Html.ul [ Attr.class "sidebar" ]
+            [ Html.li [] [ Html.button [ Ev.onClick StartSession, Attr.class "suggested" ] [ Html.text "Start" ] ]
+            , Html.li [] [ viewModeButton model Sessions "Sessions" ViewSessions ]
+            , Html.li [] [ viewModeButton model Tags "Tags" ViewTags ]
+            ]
         ]
+
+viewModeButton : ModelValue -> Mode -> String -> Msg -> Html.Html Msg
+viewModeButton model mode label message =
+    Html.button
+        [ Ev.onClick message
+        , Attr.classList [("active", model.mode == mode)]
+        ]
+        [ Html.text label ]
 
 
 viewSessions : ModelValue -> Html.Html Msg
@@ -65,19 +75,13 @@ viewSession model session =
         [ Attr.classList [ ( "outer-session", True ), ( "active", isActive session ) ] ]
         [ Html.div [ Attr.classList [ ( "session", True ), ( "active", isActive session ) ] ]
             [ Html.div [ Attr.class "time" ]
-                [ viewTime model.timeZone session.start
-                , case session.end of
-                    Nothing ->
-                        Html.span [] []
-
-                    Just end ->
-                        Html.span [] [ Html.span [ Attr.class "ui-text" ] [ Html.text " to " ], viewTime model.timeZone end ]
-                , case session.end of
+                [ case session.end of
                     Nothing ->
                         viewDuration (until session.start model.currentTime)
 
                     Just end ->
                         viewDuration (until session.start end)
+                , viewTime model.timeZone session.start
                 ]
             , Html.span [ Attr.class "tags" ]
                 (List.map (viewTag model.editingTag session) (List.range 0 (List.length session.tags - 1))
@@ -106,7 +110,6 @@ viewTag editingTag session index =
                     , Ev.onBlur SubmitTag
                     ]
                     []
-
             else
                 viewStaticTag session index
 
@@ -129,7 +132,7 @@ viewAddTagButton session =
         [ Attr.class "add-tag"
         , Ev.onClick (AddTag session)
         ]
-        [ Html.text "+" ]
+        [ Html.text "Add tag" ]
 
 
 viewSessionControls : Session -> Html.Html Msg
@@ -138,7 +141,7 @@ viewSessionControls session =
         Nothing ->
             -- Active session
             Html.div [ Attr.class "session-controls" ]
-                [ Html.button [ Ev.onClick (EndSession session), Attr.class "end-button" ] [ Html.text "End" ]
+                [ Html.button [ Ev.onClick (EndSession session), Attr.class "end-button" ] [ Html.text "Stop" ]
                 , Html.button [ Ev.onClick (DeleteSession session), Attr.class "delete-button" ] [ Html.text "Delete" ]
                 ]
 
