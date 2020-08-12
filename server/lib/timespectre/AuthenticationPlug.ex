@@ -1,12 +1,12 @@
 defmodule Timespectre.AuthenticationPlug do
   import Plug.Conn
-  import Timespectre.Authentication
+  alias Timespectre.Authentication, as: Auth
 
   def init(_opts), do: nil
 
   def call(conn, _opts) do
-    if authenticated?(conn) do
       conn
+    if Auth.authenticated?(conn) do
     else
       conn |> send_resp(401, "Not Authenticated") |> halt
     end

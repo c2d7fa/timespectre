@@ -5,7 +5,7 @@ defmodule Timespectre.ApiPlug do
 
   plug Timespectre.AuthenticationPlug
   plug :match
-  plug Plug.Parsers, parsers: [:json], pass: ["application/json"], json_decoder: Jason
+  plug Plug.Parsers, parsers: [:json], pass: [], json_decoder: Jason
   plug :dispatch
 
   forward "/stats", to: Timespectre.StatsPlug

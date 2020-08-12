@@ -3,8 +3,12 @@ defmodule Timespectre.Plug do
   alias Timespectre.Authentication, as: Auth
 
   plug Plug.Logger
-  plug Plug.Parsers, parsers: [:urlencoded]
   plug :match
+
+  # Parse URL encoded text for the login/sign-up page, but let JSON pass through
+  # - we may want to use it later for the API.
+  plug Plug.Parsers, parsers: [:urlencoded], pass: ["application/json"] 
+
   plug Plug.Static, at: "/", from: "../dist/"
   plug :dispatch
 
