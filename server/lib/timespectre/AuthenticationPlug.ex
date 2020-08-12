@@ -5,8 +5,8 @@ defmodule Timespectre.AuthenticationPlug do
   def init(_opts), do: nil
 
   def call(conn, _opts) do
-      conn
     if Auth.authenticated?(conn) do
+      assign(conn, :authenticated_user, Auth.authenticated_user(conn))
     else
       conn |> send_resp(401, "Not Authenticated") |> halt
     end
