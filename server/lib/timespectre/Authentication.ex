@@ -30,9 +30,13 @@ defmodule Timespectre.Authentication do
   end
 
   def authenticate(conn, username) do
-    token = "secret#{username}token" # [TODO] Generate secure token!
+    token = random_string(32)
     Agent.update(__MODULE__, fn sessions -> Map.put(sessions, token, username) end)
     put_resp_cookie(conn, "TimespectreAuthentication", token)
+  end
+
+  defp random_string(bytes) do
+    :crypto.strong_rand_bytes(bytes) |> Base.hex_encode32(padding: false)
   end
 
   def unauthenticate(conn) do
