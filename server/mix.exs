@@ -24,7 +24,8 @@ defmodule Timespectre.MixProject do
     [
       {:plug_cowboy, "~> 2.0"},
       {:sqlitex, "~> 1.7"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:bcrypt_elixir, "~> 2.2"}
     ]
   end
 end

@@ -33,7 +33,15 @@ defmodule Timespectre.Plug do
           IO.puts("incorrect password")
         end
       Map.has_key?(conn.body_params, "signup") ->
-        IO.puts("signup")
+        username = conn.body_params["username"]
+        case Auth.create_user(username, conn.body_params["password"]) do
+          :ok ->
+            conn
+              |> Auth.authenticate(username)
+              |> send_file(200, "../dist/index.html")
+          :user_exists ->
+            send_resp(conn, 409, "Error: The user '#{username}' already exists. Try signing up with a different username.")
+        end
       true ->
         IO.puts("error")
     end

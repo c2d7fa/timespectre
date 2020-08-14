@@ -1,5 +1,6 @@
 defmodule Timespectre.Authentication do
   import Plug.Conn
+  alias Timespectre.Database, as: Db
 
   use Agent
 
@@ -29,5 +30,25 @@ defmodule Timespectre.Authentication do
 
   def unauthenticate(conn) do
     delete_resp_cookie(conn, "TimespectreAuthentication")
+  end
+
+  def create_user(username, password) do
+    if user_exists? username do
+      :user_exists
+    else
+      add_user_to_database(username, password)
+      :ok
+    end
+  end
+
+  defp add_user_to_database(username, password) do
+    password_hash = Bcrypt.hash_pwd_salt(password)
+    Db.query!("INSERT INTO users (name, password_hash) VALUES (?1, ?2)", bind: [username, password_hash])
+  end
+
+  defp user_exists?(username) do
+    Db.query!("SELECT name FROM users WHERE name = ?1", bind: [username])
+      |> Enum.empty?
+      |> Kernel.not
   end
 end
