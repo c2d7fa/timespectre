@@ -19,7 +19,14 @@ defmodule Timespectre.Authentication do
   end
 
   def correct_credentials?(username, password) do
-    true # [TODO] Actually check password!
+    password_hashes = Db.query!("SELECT password_hash FROM users WHERE name = ?1", bind: [username])
+    unless Enum.empty?(password_hashes) do
+      [[password_hash: password_hash]] = password_hashes
+      Bcrypt.verify_pass(password, password_hash)
+    else
+      IO.puts("Someone attempted to log in to non-existent account '#{username}'.")
+      false
+    end
   end
 
   def authenticate(conn, username) do

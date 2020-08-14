@@ -23,17 +23,17 @@ defmodule Timespectre.Plug do
   end
 
   post "/" do
+    username = conn.body_params["username"]
     cond do
       Map.has_key?(conn.body_params, "login") ->
-        if Auth.correct_credentials?(conn.body_params["username"], conn.body_params["password"]) do
+        if Auth.correct_credentials?(username, conn.body_params["password"]) do
           conn
-            |> Auth.authenticate(conn.body_params["username"])
+            |> Auth.authenticate(username)
             |> send_file(200, "../dist/index.html")
         else
-          IO.puts("incorrect password")
+          send_resp(conn, 401, "The given password is incorrect or the user '#{username}' does not exist.")
         end
       Map.has_key?(conn.body_params, "signup") ->
-        username = conn.body_params["username"]
         case Auth.create_user(username, conn.body_params["password"]) do
           :ok ->
             conn
