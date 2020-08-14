@@ -3,6 +3,23 @@
 Timespectre is a minimalist time tracking application designed for personal use.
 It's built with Elixir and Elm.
 
+<p align="center"><img src="https://raw.githubusercontent.com/c2d7fa/timespectre/master/screenshot.png"/></p>
+
+**Features:**
+
+* Minimalist, responsive design intended for individuals, not teams.
+* Open source with easy setup for self-hosting.
+* Overlapping "sessions", organized with tags and free-form notes.
+* Timeline for visualizing sessions.
+
+**Try it:**
+
+    $ sudo docker pull c2d7fa/timespectre
+    $ sudo docker run --rm -ti -p 8080:80 c2d7fa/timespectre
+    $ # Then visit http://localhost:8080/ and make an account.
+
+(This doesn't persist data after the Docker container is stopped. See "With Docker" below for more information.)
+
 ## Running
 
 Timespectre is configurable through the following environment variables:
@@ -13,7 +30,7 @@ Timespectre is configurable through the following environment variables:
 You have two options for running Timespectre. You can either use the Docker
 image, or run it directly on a Linux machine with Elixir and Elm.
 
-### With Docker
+### With Docker (Recommended)
 
 The official Docker image for Timespectre is `c2d7fa/timespectre`. Run it like so:
 
@@ -21,9 +38,10 @@ The official Docker image for Timespectre is `c2d7fa/timespectre`. Run it like s
 
 You can configure it through environment variables; see the list above.
 
-If you prefer, you can also build the image yourself:
+If you prefer, you can also build the image yourself from this repository:
 
-    # docker build .
+    # docker build -t timespectre .
+    # docker run -ti -v $(pwd)/data:/var/lib/timespectre -p 80 timespectre
 
 ### Without Docker
 
@@ -59,4 +77,4 @@ Then, run it, and make sure the working directory is mounted in `/work`. You'll 
 
     # docker run -ti -v $(pwd):/work -p 127.0.0.1:8080:80 timespectre-dev
 
-From inside the Docker image, follow the instructions above (under "Without Docker") to build and run Timespectre. You will need to rerun `./build.sh` each time you change static resources, and `./run.sh` each time you cahnge the Elixir code.
+From inside the Docker image, follow the instructions above (see "Without Docker") to build and run Timespectre. You will need to rerun `./build.sh` each time you change static resources, and `./run.sh` each time you cahnge the Elixir code.
