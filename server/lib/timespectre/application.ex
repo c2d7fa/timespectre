@@ -21,6 +21,7 @@ defmodule Timespectre.Application do
 
     children = [
       {Timespectre.Database, [db_path]},
+      {Timespectre.Authentication, []},
       {Plug.Cowboy, scheme: :http, plug: Timespectre.Plug, port: port}
     ]
 

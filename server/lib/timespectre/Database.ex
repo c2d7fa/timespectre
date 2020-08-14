@@ -1,8 +1,8 @@
 defmodule Timespectre.Database do
   def child_spec(args) do
     %{
-      id: Timespectre.Database,
-      start: {Timespectre.Database, :start_link, args}
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, args}
     }
   end
 
