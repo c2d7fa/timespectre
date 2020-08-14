@@ -51,3 +51,4 @@ type Msg
     | ViewSessions
     | ViewTags
     | ViewTagsToday
+    | LogOut

@@ -1,8 +1,8 @@
 defmodule Timespectre.Database do
   def child_spec(args) do
     %{
-      id: Timespectre.Database,
-      start: {Timespectre.Database, :start_link, args}
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, args}
     }
   end
 
@@ -14,19 +14,28 @@ defmodule Timespectre.Database do
 
   defp initialize_tables() do
     query! """
+      CREATE TABLE IF NOT EXISTS users (
+        name TEXT PRIMARY KEY,
+        password_hash TEXT NOT NULL
+      )
+    """
+    query! """
       CREATE TABLE IF NOT EXISTS sessions (
-        id TEXT PRIMARY KEY,
+        user TEXT REFERENCES users (name),
+        id TEXT,
         start INTEGER NOT NULL,
         end INTEGER,
         notes TEXT NOT NULL DEFAULT '',
-        deleted INTEGER DEFAULT 0
+        deleted INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (user, id)
       )
       """
     query! """
       CREATE TABLE IF NOT EXISTS session_tags (
-        session_id TEXT REFERENCES sessions(id),
+        user TEXT NOT NULL,
+        session_id TEXT NOT NULL,
         tag TEXT NOT NULL,
-        PRIMARY KEY (session_id, tag)
+        FOREIGN KEY (user, session_id) REFERENCES sessions (user, id)
       )
       """
   end

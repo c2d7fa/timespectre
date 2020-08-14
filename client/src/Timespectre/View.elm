@@ -52,6 +52,7 @@ viewNavigation model =
             [ Html.li [] [ Html.button [ Ev.onClick StartSession, Attr.class "suggested" ] [ Html.text "Start" ] ]
             , Html.li [] [ viewModeButton model Sessions "Sessions" ViewSessions ]
             , Html.li [] [ viewModeButton model Tags "Tags" ViewTags ]
+            , Html.li [] [ Html.button [ Ev.onClick LogOut ] [ Html.text "Log out" ] ]
             ]
         ]
 
