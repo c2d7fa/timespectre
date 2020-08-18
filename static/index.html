@@ -12,7 +12,19 @@
   <div id="app"></div>
   <script src="main.js"></script>
   <script>
-    Elm.Main.init({ node: document.getElementById("app") });
+    const app = Elm.Main.init({ node: document.getElementById("app") });
+
+    app.ports.focusEditingTag.subscribe(() => {
+      setTimeout(() => {
+        for (const element of document.getElementsByClassName("editing-tag")) {
+          if (element instanceof HTMLInputElement) {
+            element.focus();
+            element.selectionStart = 0;
+            element.selectionEnd = element.value.length;
+          }
+        }
+      })
+    })
   </script>
 </body>
 

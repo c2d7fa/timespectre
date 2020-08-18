@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Browser.Navigation exposing (load)
@@ -10,6 +10,9 @@ import Timespectre.Data exposing (..)
 import Timespectre.Model exposing (..)
 import Timespectre.Util as Util
 import Timespectre.View exposing (view)
+
+
+port focusEditingTag : () -> Cmd msg
 
 
 main : Program () Model Msg
@@ -83,7 +86,7 @@ update msg model =
                     ( Model { value | sessions = endSession session value.currentTime value.sessions }, API.putEnd session value.currentTime )
 
                 EditTag session index ->
-                    ( Model { value | editingTag = Just { session = session, index = index, buffer = nthTag session index } }, Cmd.none )
+                    ( Model { value | editingTag = Just { session = session, index = index, buffer = nthTag session index } }, focusEditingTag () )
 
                 AddTag session ->
                     let
