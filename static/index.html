@@ -15,7 +15,7 @@
     const app = Elm.Main.init({ node: document.getElementById("app") });
 
     app.ports.focusEditingTag.subscribe(() => {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         for (const element of document.getElementsByClassName("editing-tag")) {
           if (element instanceof HTMLInputElement) {
             element.focus();
