@@ -38,6 +38,11 @@ defmodule Timespectre.Database do
         FOREIGN KEY (user, session_id) REFERENCES sessions (user, id)
       )
       """
+    query! """
+      CREATE INDEX IF NOT EXISTS session_tags_index ON session_tags (
+        user, session_id
+      )
+    """
   end
 
   def query!(sql, opts \\ []) do
