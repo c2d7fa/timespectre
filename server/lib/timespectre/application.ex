@@ -8,7 +8,10 @@ defmodule Timespectre.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
-    {port, _} = Integer.parse(System.get_env("TIMESPECTRE_PORT") || "80")
+    port = case Integer.parse(System.get_env("TIMESPECTRE_PORT")) do
+      {port, _} -> port
+      :error -> 80
+    end
 
     db_path = System.get_env("TIMESPECTRE_DATABASE_PATH") || "/var/lib/timespectre/data.db"
 
@@ -17,7 +20,7 @@ defmodule Timespectre.Application do
       File.mkdir!(db_dir)
     end
 
-    IO.puts("Listening on http://localhost:#{port}/index.html")
+    IO.puts("Listening on localhost:#{port}...")
 
     children = [
       {Timespectre.Database, [db_path]},
