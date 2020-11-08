@@ -29,7 +29,8 @@ defmodule Timespectre.Plug do
         if Auth.correct_credentials?(username, conn.body_params["password"]) do
           conn
             |> Auth.authenticate(username)
-            |> send_file(200, "../dist/index.html")
+            |> put_resp_header("location", "/")
+            |> send_resp(303, "")
         else
           send_resp(conn, 401, "The given password is incorrect or the user '#{username}' does not exist.")
         end
