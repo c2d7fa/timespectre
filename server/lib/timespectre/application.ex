@@ -8,10 +8,13 @@ defmodule Timespectre.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
-    port = case Integer.parse(System.get_env("TIMESPECTRE_PORT")) do
-      {port, _} -> port
-      :error -> 80
-    end
+    port =
+      with port_str when not is_nil(port_str) <- System.get_env("TIMESPECTRE_PORT"),
+           {port, _} <- Integer.parse(port_str) do
+        port
+      else
+        _ -> 80
+      end
 
     db_path = System.get_env("TIMESPECTRE_DATABASE_PATH") || "/var/lib/timespectre/data.db"
 
