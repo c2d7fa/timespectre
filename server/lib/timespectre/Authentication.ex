@@ -32,7 +32,7 @@ defmodule Timespectre.Authentication do
   def authenticate(conn, username) do
     token = random_string(32)
     Agent.update(__MODULE__, fn sessions -> Map.put(sessions, token, username) end)
-    put_resp_cookie(conn, "TimespectreAuthentication", token)
+    put_resp_cookie(conn, "TimespectreAuthentication", token, max_age: 7 * 24 * 60 * 60)
   end
 
   defp random_string(bytes) do
