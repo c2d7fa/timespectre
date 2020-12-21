@@ -30,7 +30,7 @@ RUN \
 
 # Build and run Elixir server.
 
-FROM elixir:1.10.1
+FROM elixir:1.11
 
 RUN mkdir -p /timespectre
 WORKDIR /timespectre
