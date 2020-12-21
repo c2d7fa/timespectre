@@ -353,3 +353,81 @@ table.tag-stats td {
 }
 
 /* #endregion */
+
+/* #region Login */
+
+#login {
+  height: 100vh;
+  width: 100vw;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: $ui-font-family;
+
+  form {
+    display: grid;
+    grid-template:
+      "username-label username-input" auto
+      "password-label password-input" auto
+      "buttons buttons" auto
+      / auto 1fr;
+    row-gap: 12px;
+    column-gap: 12px;
+
+    padding: 12px;
+    border: 12px solid hsl(200, 35%, 55%);
+
+    label {
+      align-self: center;
+      text-transform: lowercase;
+      color: $button-active-color;
+    }
+
+    input[type="text"], input[type="password"] {
+      font: inherit;
+      border: none;
+      outline: none;
+      padding: 3px 6px;
+
+      color: #000000e0;
+      background-color: #00000010;
+    }
+
+    .buttons {
+      grid-area: buttons;
+
+      display: flex;
+      justify-content: flex-end;
+      column-gap: 12px;
+
+      input {
+        border: none;
+        outline: none;
+        background: none;
+
+        cursor: pointer;
+
+        font: inherit;
+        color: $button-inactive-color;
+        text-transform: lowercase;
+
+        &:hover {
+          color: $button-hover-color;
+        }
+
+        &[name="login"] {
+          font-weight: bold;
+          color: $button-suggested-color;
+
+          &:hover {
+            color: $button-suggested-hover-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* #endregion */
