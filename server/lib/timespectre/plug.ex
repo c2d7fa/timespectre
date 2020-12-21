@@ -39,7 +39,8 @@ defmodule Timespectre.Plug do
           :ok ->
             conn
               |> Auth.authenticate(username)
-              |> send_file(200, "../dist/index.html")
+              |> put_resp_header("location", "/")
+              |> send_resp(303, "")
           :user_exists ->
             send_resp(conn, 409, "Error: The user '#{username}' already exists. Try signing up with a different username.")
         end
