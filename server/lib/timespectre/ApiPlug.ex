@@ -66,6 +66,49 @@ defmodule Timespectre.ApiPlug do
     send_resp(conn, 200, Jason.encode! result)
   end
 
+  get "/status.txt" do
+      active = query! """
+      SELECT
+        start, IFNULL(GROUP_CONCAT(tag), '') AS tags
+      FROM sessions
+      LEFT JOIN session_tags ON sessions.user = session_tags.user AND sessions.id = session_tags.session_id
+      WHERE
+        sessions.user = ?1 AND
+        NOT deleted AND
+        end IS NULL
+      GROUP BY sessions.id
+    """, bind: [authenticated_user()]
+
+    split_comma_list = fn s ->
+      String.split(s, ",") |> Enum.filter(fn x -> x != "" end)
+    end
+
+    active = Enum.map(active, fn session ->
+      session
+        |> Map.new
+        |> Map.put(:tags, split_comma_list.(Keyword.get(session, :tags)))
+        |> Map.put(:duration, System.os_time(:millisecond) - Keyword.get(session, :start))
+    end)
+
+    tags = active
+      |> Enum.flat_map(fn s -> Map.get(s, :tags) end)
+      |> Enum.uniq
+      |> Enum.join(", ")
+
+    format_millisecond_time = fn ms ->
+      "#{trunc(ms / (1000 * 60))}m"
+    end
+
+    time = active
+      |> Enum.map(fn s -> Map.get(s, :duration) end)
+      |> Enum.min
+      |> format_millisecond_time.()
+
+      body = if tags == "" do time else "#{time} (#{tags})" end
+
+      send_resp(conn, 200, body)
+  end
+
   # Rename or create tag
   post "/sessions/:id/tags/:tag" do
     new_tag = conn.body_params["_json"]
