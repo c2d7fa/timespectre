@@ -1,6 +1,9 @@
 defmodule Timespectre.StatsPlug do
   import Timespectre.Database, only: [{:query!, 2}, {:query!, 1}]
 
+  require Timespectre.AuthenticationPlug
+  import Timespectre.AuthenticationPlug, only: [{:conn_user, 0}]
+
   use Plug.Router
 
   plug :match
@@ -19,12 +22,15 @@ defmodule Timespectre.StatsPlug do
     result = query! """
       SELECT tag, SUM(end - start) as duration
       FROM session_tags
-      JOIN sessions ON id = session_id
+      JOIN sessions ON
+            id = session_id
+        AND sessions.user = session_tags.user
       WHERE
         NOT deleted
         AND start >= ?1
+        AND sessions.user = ?2
       GROUP BY tag
-      """, bind: [since]
+      """, bind: [since, conn_user]
 
     map = Map.new result, fn [tag: tag, duration: duration] -> {tag, duration || 0} end
 
